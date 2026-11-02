@@ -129,6 +129,8 @@
       var list = [];
       scope.querySelectorAll("h1,h2,h3,h4,p,li,dt,dd,figcaption,img").forEach(function (el) {
         if (el.closest(".reader") || el.closest('[aria-hidden="true"]') || el.closest("nav")) return;
+        var closed = el.closest("details:not([open])");
+        if (closed && !el.closest("summary")) return;
         var text, target = el;
         if (el.tagName === "IMG") {
           if (!el.alt) return;
@@ -286,11 +288,96 @@
     dlg.addEventListener("close", function () { big.removeAttribute("src"); });
   }
 
+  /* 5 · Carrusel de vídeos: carril continuo de derecha a izquierda, pausable */
+  function initCarousel() {
+    var root = document.querySelector(".carousel");
+    if (!root) return;
+    var track = root.querySelector(".carousel__track");
+    var items = Array.prototype.slice.call(track.children);
+    var bar = root.querySelector(".carousel__bar");
+    var toggle = root.querySelector('[data-carousel="toggle"]');
+    var label = toggle.querySelector("span");
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var SPEED = 40; /* px por segundo */
+    var playing = !reduce, hover = false, touched = false, touchTimer = null;
+    var pos = 0, setLeft = 0, last = 0;
+    bar.hidden = false;
+
+    /* Copias decorativas del principio para que el bucle no tenga saltos */
+    var clones = items.slice(0, Math.min(3, items.length)).map(function (it) {
+      var c = it.cloneNode(true);
+      c.setAttribute("aria-hidden", "true"); c.setAttribute("inert", "");
+      c.removeAttribute("role"); c.removeAttribute("aria-roledescription"); c.removeAttribute("aria-label");
+      track.appendChild(c); return c;
+    });
+    function loop() { return clones[0].offsetLeft - items[0].offsetLeft; }
+    function stepSize() { return items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : track.clientWidth; }
+    function busy() {
+      return hover || touched || root.contains(document.activeElement) || !!root.querySelector("details[open]") || document.hidden;
+    }
+    function render() {
+      label.textContent = playing ? "Pausar movimiento" : "Reanudar movimiento";
+      track.setAttribute("aria-live", playing ? "off" : "polite");
+      track.classList.toggle("is-moving", playing);
+    }
+    function frame(t) {
+      var dt = last ? Math.min((t - last) / 1000, 0.1) : 0; last = t;
+      var now = track.scrollLeft;
+      if (Math.abs(now - setLeft) > 2) { pos = now; setLeft = now; }       /* la persona se ha desplazado */
+      var w = loop();
+      if (w > 0 && now >= w + 1 && Math.abs(now - setLeft) <= 2) { pos = now - w; track.scrollLeft = pos; setLeft = track.scrollLeft; }
+      else if (playing && !busy() && w > 0) {
+        pos += SPEED * dt;
+        if (pos >= w) pos -= w;
+        var r = Math.round(pos);
+        if (r !== Math.round(now)) track.scrollLeft = r;
+        setLeft = track.scrollLeft;
+      }
+      requestAnimationFrame(frame);
+    }
+    function step(dir) {
+      var w = loop();
+      if (dir < 0 && track.scrollLeft < stepSize() && w > 0) { track.scrollLeft += w; setLeft = track.scrollLeft; pos = setLeft; }
+      track.scrollBy({ left: dir * stepSize(), behavior: reduce ? "auto" : "smooth" });
+    }
+
+    root.addEventListener("pointerenter", function () { hover = true; });
+    root.addEventListener("pointerleave", function () { hover = false; });
+    root.addEventListener("touchstart", function () {
+      touched = true; clearTimeout(touchTimer);
+      touchTimer = setTimeout(function () { touched = false; }, 9000);
+    }, { passive: true });
+    toggle.addEventListener("click", function () { playing = !playing; render(); });
+    root.querySelector('[data-carousel="prev"]').addEventListener("click", function () { step(-1); });
+    root.querySelector('[data-carousel="next"]').addEventListener("click", function () { step(1); });
+    render();
+    requestAnimationFrame(frame);
+  }
+
+  /* 6 · Aparición suave al hacer scroll y pausa de decoraciones fuera de pantalla */
+  function initMotion() {
+    if (!("IntersectionObserver" in window)) {
+      document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-visible"); });
+      document.querySelectorAll(".deco").forEach(function (el) { el.classList.add("is-live"); });
+      return;
+    }
+    var reveal = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-visible"); reveal.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    document.querySelectorAll("[data-reveal]").forEach(function (el) { reveal.observe(el); });
+    var live = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { e.target.classList.toggle("is-live", e.isIntersecting); });
+    });
+    document.querySelectorAll(".deco").forEach(function (el) { live.observe(el); });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initMenu();
     initIndexPanel();
     initScrollSpy();
     initReader();
     initZoom();
+    initCarousel();
+    initMotion();
   });
 })();
