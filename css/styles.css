@@ -241,6 +241,14 @@ h1 .h1__em { font-style: italic; color: var(--gold-text); }
 .video__player { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(200, 168, 130, .35); border-radius: 12px; background: #000; }
 .video__player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .videos .back-top a { color: var(--gold); }
+.yt-facade { display: none; position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; }
+.js .yt-facade { display: block; }
+.yt-facade img { width: 100%; height: 100%; object-fit: cover; opacity: .9; transition: opacity .2s, transform .4s; }
+.yt-facade:hover img { opacity: 1; transform: scale(1.03); }
+.yt-play { position: absolute; left: 50%; top: 50%; width: 4rem; height: 4rem; margin: -2rem 0 0 -2rem; border-radius: 50%; background: rgba(15, 42, 46, .85); border: 2px solid var(--gold); }
+.yt-play::after { content: ""; position: absolute; left: 1.45rem; top: 1.1rem; border-style: solid; border-width: .9rem 0 .9rem 1.4rem; border-color: transparent transparent transparent var(--gold); }
+.yt-facade:hover .yt-play { background: var(--gold); }
+.yt-facade:hover .yt-play::after { border-left-color: #0f2a2e; }
 .video__link { display: inline-block; margin-top: .75rem; color: var(--gold); font: .8125rem var(--sans); }
 
 /* Etiquetas, clasificación y conclusión */
@@ -311,6 +319,28 @@ html:has(dialog[open]) { overflow: hidden; }
 .promo__more[open] summary::after { transform: rotate(180deg); }
 .promo__text { max-height: 22rem; overflow-y: auto; padding: .5rem .25rem 0; font-size: .9375rem; line-height: 1.7; color: #dce6e8; }
 .promo__text p { margin-bottom: 1rem; overflow-wrap: anywhere; }
+
+/* Animaciones al hacer scroll (todas las páginas) ------------------------- */
+.scroll-progress { position: fixed; top: 0; left: 0; right: 0; z-index: 70; height: 3px; background: linear-gradient(90deg, var(--gold), #e8c478); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); pointer-events: none; }
+.site-header { transition: box-shadow .3s; }
+.site-header.is-scrolled { box-shadow: 0 8px 28px rgba(0, 0, 0, .1); }
+@keyframes rise-in { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+@keyframes breathe { 0%, 100% { box-shadow: 0 20px 60px rgba(0, 0, 0, .15); } 50% { box-shadow: 0 20px 70px rgba(200, 168, 130, .45); } }
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0s); }
+  .js [data-reveal].is-visible { opacity: 1; transform: none; }
+  .js .band[data-reveal] { opacity: 1; transform: none; }
+  .js .band[data-reveal] .band__text { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1); }
+  .js .band[data-reveal] .band__media { opacity: 0; transform: scale(.94); transition: opacity .9s .15s ease, transform .9s .15s cubic-bezier(.2, .7, .2, 1); }
+  .js .band[data-reveal].is-visible .band__text, .js .band[data-reveal].is-visible .band__media { opacity: 1; transform: none; }
+  .section__head .rule { transform: scaleY(0); transform-origin: top; transition: transform 1s .3s ease; }
+  .section__head.is-visible .rule { transform: scaleY(1); }
+  .hero__text > * { animation: rise-in 1s cubic-bezier(.2, .7, .2, 1) both; }
+  .hero__text > :nth-child(2) { animation-delay: .12s; } .hero__text > :nth-child(3) { animation-delay: .24s; }
+  .hero__text > :nth-child(4) { animation-delay: .36s; } .hero__text > :nth-child(5) { animation-delay: .48s; } .hero__text > :nth-child(6) { animation-delay: .6s; }
+  .hero__cover .frame { animation: rise-in 1.2s .2s cubic-bezier(.2, .7, .2, 1) both, breathe 7s 1.4s ease-in-out infinite; }
+  .band__media .frame, .figure .frame, .about__media .frame, .guardian .frame { will-change: translate; }
+}
 
 /* Capítulos */
 .btn--ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); box-shadow: none; }

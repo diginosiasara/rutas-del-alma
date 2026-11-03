@@ -354,21 +354,88 @@
     requestAnimationFrame(frame);
   }
 
-  /* 6 · Aparición suave al hacer scroll y pausa de decoraciones fuera de pantalla */
+  /* 5b · Vídeos de YouTube bajo demanda: no se descarga el reproductor hasta pulsar */
+  function initVideoFacades() {
+    document.addEventListener("click", function (e) {
+      var f = e.target.closest(".yt-facade");
+      if (!f) return;
+      var ifr = document.createElement("iframe");
+      ifr.src = "https://www.youtube-nocookie.com/embed/" + f.getAttribute("data-yt") + "?rel=0&autoplay=1";
+      ifr.title = f.getAttribute("data-title") + " — reproductor de YouTube";
+      ifr.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      ifr.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+      ifr.setAttribute("allowfullscreen", "");
+      f.replaceWith(ifr);
+      ifr.focus();
+    });
+  }
+
+  /* 6 · Animaciones de scroll: aparición escalonada, progreso, cabecera y parallax suave */
   function initMotion() {
-    if (!("IntersectionObserver" in window)) {
-      document.querySelectorAll("[data-reveal]").forEach(function (el) { el.classList.add("is-visible"); });
-      document.querySelectorAll(".deco").forEach(function (el) { el.classList.add("is-live"); });
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var all = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+    /* Barra de progreso de lectura y sombra de cabecera (no son movimiento ornamental) */
+    var bar = document.createElement("div");
+    bar.className = "scroll-progress"; bar.setAttribute("aria-hidden", "true");
+    document.body.appendChild(bar);
+    var header = document.querySelector(".site-header");
+    var parallax = [], ticking = false;
+
+    function update() {
+      ticking = false;
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.setProperty("--p", max > 0 ? Math.min(window.scrollY / max, 1).toFixed(4) : 0);
+      if (header) header.classList.toggle("is-scrolled", window.scrollY > 8);
+      if (reduce) return;
+      var vh = window.innerHeight;
+      parallax.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        var p = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2)));
+        el.style.translate = "0 " + (-p * 14).toFixed(1) + "px";
+      });
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    update();
+
+    if (!("IntersectionObserver" in window) || reduce) {
+      all("[data-reveal]").forEach(function (el) { el.classList.add("is-visible"); });
+      all(".deco").forEach(function (el) { el.classList.add("is-live"); });
       return;
     }
+
+    /* Elementos por debajo del pliegue que no traían data-reveal: se revelan también */
+    var AUTO = ".section__head, .figure, .band, .card, .guardian, .about__text, .about__media, .toc li, .tags li, .ratings > div, .areas > div, .chapter-toc__list > li, .mini-card, .facts > div, .video, .promo__card, .stats > div, .exercise, .site-footer__inner";
+    all(AUTO).forEach(function (el) {
+      if (!el.hasAttribute("data-reveal") && el.getBoundingClientRect().top > window.innerHeight * 0.95) el.setAttribute("data-reveal", "");
+    });
+    /* Escalonado entre hermanos */
+    all(".tags, .ratings, .areas, .toc, .chapter-toc__list, .mini-grid, .facts, .stats, .guardians__grid, .videos__grid").forEach(function (g) {
+      Array.prototype.forEach.call(g.children, function (c, i) { c.style.setProperty("--d", (i * 0.09).toFixed(2) + "s"); });
+    });
+
     var reveal = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-visible"); reveal.unobserve(e.target); } });
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-    document.querySelectorAll("[data-reveal]").forEach(function (el) { reveal.observe(el); });
+    all("[data-reveal]").forEach(function (el) { reveal.observe(el); });
+
     var live = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) { e.target.classList.toggle("is-live", e.isIntersecting); });
     });
-    document.querySelectorAll(".deco").forEach(function (el) { live.observe(el); });
+    all(".deco").forEach(function (el) { live.observe(el); });
+
+    /* Parallax: solo se calcula para las láminas visibles */
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var i = parallax.indexOf(e.target);
+        if (e.isIntersecting && i < 0) parallax.push(e.target);
+        else if (!e.isIntersecting && i >= 0) { parallax.splice(i, 1); e.target.style.translate = ""; }
+      });
+      onScroll();
+    }, { rootMargin: "20% 0px" });
+    all(".band__media .frame, .figure .frame, .about__media .frame, .guardian .frame").forEach(function (el) { seen.observe(el); });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -378,6 +445,7 @@
     initReader();
     initZoom();
     initCarousel();
+    initVideoFacades();
     initMotion();
   });
 })();
