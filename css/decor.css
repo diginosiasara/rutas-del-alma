@@ -32,8 +32,8 @@
 .ask { margin: 1rem 0; padding-left: 1.25rem; border-left: 2px solid var(--gold); font: italic 1.25rem/1.5 var(--serif); }
 
 /* Tarjetas imagen+texto: la primera lleva la imagen a la izquierda, como en el original */
-.theme-sauce .band:nth-child(even) .band__media { order: 0; }
-.theme-sauce .band:nth-child(odd) .band__media { order: -1; }
+.theme-sauce .band:nth-child(even) .band__media, .theme-luz .band:nth-child(even) .band__media { order: 0; }
+.theme-sauce .band:nth-child(odd) .band__media, .theme-luz .band:nth-child(odd) .band__media { order: -1; }
 .page-no { margin-top: 1.5rem; text-align: right; color: var(--muted); }
 .callout--center { text-align: center; border-left: 0; border-radius: 14px; padding: 1.5rem; }
 .callout--center blockquote p { font: italic 1.5rem/1.4 var(--serif); }
@@ -201,3 +201,7 @@
 @media (max-width: 40em) { .moon { right: 4%; width: 2.75rem; height: 2.75rem; } .mirror, .lantern { right: 3%; transform: scale(.75); transform-origin: top right; } .waves span { left: 3%; } }
 @media (prefers-reduced-motion: reduce) { .deco * { animation: none !important; } .leaf { opacity: .35; } }
 @media print { .deco, .leaf-divider { display: none; } }
+
+/* Capítulo 03 · La Luz Interior: fichas de rasgos dentro de las tarjetas */
+.band .stats { grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); max-width: none; margin-top: 1.5rem; gap: 0 1rem; }
+.band .stats dd { font-size: 1.25rem; color: var(--gold-text); }
