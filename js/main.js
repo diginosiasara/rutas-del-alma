@@ -89,9 +89,144 @@
     var hint = root.querySelector("[data-hint]");
     var main = document.getElementById("contenido");
     var blocks = [], pos = { b: 0, c: 0 }, token = 0, marked = null, lastSelection = "", state = "idle";
+    var retries = 0, lastStart = 0, watchdog = null;
 
     root.hidden = false;
     document.body.classList.add("has-reader");
+
+    /* Mantiene la pantalla encendida solo mientras se está leyendo en voz alta.
+       Se libera al pausar, detener o terminar, y se vuelve a pedir si la pestaña
+       recupera el foco (el navegador la libera al ocultar la página). */
+    var wake = null, wantWake = false;
+    function requestWake() {
+      wantWake = true;
+      if (!("wakeLock" in navigator) || wake || document.visibilityState !== "visible") return;
+      navigator.wakeLock.request("screen").then(function (lock) {
+        if (!wantWake) { lock.release().catch(function () {}); return; }
+        wake = lock;
+        lock.addEventListener("release", function () { if (wake === lock) wake = null; });
+      }).catch(function () { /* sin permiso o sin HTTPS: la lectura sigue igual */ });
+    }
+    function releaseWake() {
+      wantWake = false;
+      if (wake) { var lock = wake; wake = null; lock.release().catch(function () {}); }
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible" && wantWake) requestWake();
+    });
+
+    /* ---- Preferencias del lector (se guardan solo en este dispositivo) ---- */
+    var PREFS_KEY = "ruta-del-alma:lector";
+    var prefs = { rate: "", voice: "", keep: true, images: true };
+    try { var raw = window.localStorage.getItem(PREFS_KEY); if (raw) Object.assign(prefs, JSON.parse(raw)); } catch (e) {}
+    function savePrefs() { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {} }
+    if (prefs.rate && rate.querySelector('option[value="' + prefs.rate + '"]')) rate.value = prefs.rate;
+    rate.addEventListener("change", function () { prefs.rate = rate.value; savePrefs(); });
+
+    /* ---- Controles extra (se crean aquí para no repetir el HTML en cada página) ---- */
+    var opts = root.querySelector(".reader__opts");
+    function field(html, cls) { var d = document.createElement("div"); d.className = "reader__field" + (cls ? " " + cls : ""); d.innerHTML = html; opts.appendChild(d); return d; }
+    var secRow = field('<button type="button" class="reader__btn" data-action="section">Leer este apartado</button>'
+      + '<button type="button" class="reader__btn" data-action="head-prev" disabled>Apartado anterior</button>'
+      + '<button type="button" class="reader__btn" data-action="head-next" disabled>Apartado siguiente</button>', "reader__field--stack");
+    var voiceRow = field('<label class="reader__label" for="reader-voice">Voz</label><select id="reader-voice" class="reader__select"></select>');
+    var keepRow = field('<label class="reader__check"><input type="checkbox" data-pref="keep"><span>Mantener activo en el móvil: pantalla encendida y sesión de audio para que no se corte al bloquear</span></label>');
+    var imgRow = field('<label class="reader__check"><input type="checkbox" data-pref="images"><span>Leer también las descripciones de las imágenes</span></label>');
+    var secBtn = secRow.querySelector('[data-action="section"]'), headPrev = secRow.querySelector('[data-action="head-prev"]'), headNext = secRow.querySelector('[data-action="head-next"]');
+    var voiceSel = voiceRow.querySelector("select");
+    var chkKeep = keepRow.querySelector("input"), chkImg = imgRow.querySelector("input");
+    chkKeep.checked = !!prefs.keep; chkImg.checked = !!prefs.images;
+    chkKeep.addEventListener("change", function () { prefs.keep = chkKeep.checked; savePrefs(); if (state === "playing") { prefs.keep ? (requestWake(), startKeepAlive()) : (releaseWake(), stopKeepAlive()); } });
+    chkImg.addEventListener("change", function () { prefs.images = chkImg.checked; savePrefs(); });
+    var prog = document.createElement("progress");
+    prog.className = "reader__progress"; prog.hidden = true; prog.value = 0; prog.max = 1;
+    prog.setAttribute("aria-label", "Progreso de la lectura");
+    panel.insertBefore(prog, panel.querySelector(".reader__row"));
+    fab.setAttribute("aria-keyshortcuts", "Alt+Shift+L");
+
+    /* ---- Voces en español ---- */
+    var voices = [];
+    function loadVoices() {
+      voices = synth.getVoices().filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf("es") === 0; })
+        .sort(function (a, b) { return (b.lang.toLowerCase() === "es-es") - (a.lang.toLowerCase() === "es-es"); });
+      voiceSel.innerHTML = '<option value="">Automática</option>';
+      voices.forEach(function (v) { var o = document.createElement("option"); o.value = v.voiceURI; o.textContent = v.name + " (" + v.lang + ")"; voiceSel.appendChild(o); });
+      voiceSel.value = prefs.voice; if (voiceSel.value !== prefs.voice) voiceSel.value = "";
+      voiceRow.hidden = voices.length < 2;
+    }
+    voiceSel.addEventListener("change", function () { prefs.voice = voiceSel.value; savePrefs(); if (state === "playing") restartCurrent(); });
+    loadVoices();
+    if (synth.addEventListener) synth.addEventListener("voiceschanged", loadVoices); else synth.onvoiceschanged = loadVoices;
+
+    /* ---- Mantener viva la sesión en el móvil -----------------------------------
+       1) Pantalla encendida (Wake Lock; si no existe, vídeo mudo diminuto).
+       2) Audio mudo en bucle + Media Session: el sistema trata la página como
+          reproducción multimedia (controles en la pantalla de bloqueo, menos
+          probabilidad de que la suspenda al ir a segundo plano).
+       Ningún navegador garantiza seguir hablando con la pantalla bloqueada; si el
+       sistema interrumpe la voz, el vigilante la reanuda al volver. */
+    var keepAudio = null, keepVideo = null;
+    function silentWavUrl() {
+      var rate8 = 8000, n = rate8, buf = new ArrayBuffer(44 + n), v = new DataView(buf), i;
+      function str(o, t) { for (var k = 0; k < t.length; k++) v.setUint8(o + k, t.charCodeAt(k)); }
+      str(0, "RIFF"); v.setUint32(4, 36 + n, true); str(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+      v.setUint16(22, 1, true); v.setUint32(24, rate8, true); v.setUint32(28, rate8, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+      str(36, "data"); v.setUint32(40, n, true);
+      for (i = 0; i < n; i++) v.setUint8(44 + i, 128);
+      return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+    }
+    function startVideoFallback() {
+      if (keepVideo) { keepVideo.play().catch(function () {}); return; }
+      keepVideo = document.createElement("video");
+      keepVideo.setAttribute("playsinline", ""); keepVideo.setAttribute("aria-hidden", "true"); keepVideo.setAttribute("tabindex", "-1");
+      keepVideo.muted = true; keepVideo.loop = true;
+      keepVideo.style.cssText = "position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:.01;pointer-events:none";
+      keepVideo.innerHTML = '<source src="data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAJAEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggIq7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECPQAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYhyJESsCZXEhJyBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhAvrwgDgibCBILqBIJqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYhyJESsCZXEhGfIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDEuMDAwMDAwMDAwAB9DtnVAheeBAKOkgQAAgDACAJ0BKiAAIAAARwiFhYiFhIgCAgAHkPPJwP7/q1CAo5WBAMgAsQEAARAQABgAGFgv9AAIcACjlYEBkACxAQABEBAAGAAYWC/0AAhwAKOVgQJYALEBAAEQEAAYABhYL/QACHAAo5WBAyAAsQEAARAQABgAGFgv9AAIcAAcU7trkbuPs4EAt4r3gQHxggGf8IED" type="video/webm"><source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM3bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmF0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAACAAAAAgAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAHZbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABhG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAURzdGJsAAAAuHN0c2QAAAAAAAAAAQAAAKhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAACAAIABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAALmF2Y0MBQsAK/+EAFmdCwArZCWwEQAAAAwBAAAADAoPEiZIBAAVoy4PLIAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAABVgAAAVYAAAABhzdHRzAAAAAAAAAAEAAAAFAAAIAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAHHN0c2MAAAAAAAAAAQAAAAEAAAAFAAAAAQAAAChzdHN6AAAAAAAAAAAAAAAFAAAChQAAAAoAAAAKAAAACgAAAAkAAAAUc3RjbwAAAAAAAAABAAADZwAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNjAuMTYuMTAwAAAACGZyZWUAAAK0bWRhdAAAAnAGBf//bNxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjQgcjMxMDggMzFlMTlmOSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjMgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0wIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDE6MHgxMTEgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTAgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MCB3ZWlnaHRwPTAga2V5aW50PTI1MCBrZXlpbnRfbWluPTUgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAANZYiEBHyYoAA2IyddeAAAAAZBmjgI+WAAAAAGQZpUAj5YAAAABkGaYBDywAAAAAVBmoA/yw==" type="video/mp4">';
+      document.body.appendChild(keepVideo);
+      var pv = keepVideo.play(); if (pv && pv.catch) pv.catch(function () {});
+    }
+    function startKeepAlive() {
+      if (!prefs.keep) return;
+      requestWake();
+      try {
+        if (!keepAudio) { keepAudio = new Audio(silentWavUrl()); keepAudio.loop = true; keepAudio.setAttribute("aria-hidden", "true"); }
+        var pa = keepAudio.play(); if (pa && pa.catch) pa.catch(function () {});
+      } catch (e) {}
+      if (!("wakeLock" in navigator)) startVideoFallback();
+    }
+    function stopKeepAlive() {
+      try { if (keepAudio) keepAudio.pause(); } catch (e) {}
+      try { if (keepVideo) keepVideo.pause(); } catch (e) {}
+    }
+    function sessionState(s) { if ("mediaSession" in navigator) { try { navigator.mediaSession.playbackState = s; } catch (e) {} } }
+    (function initSession() {
+      if (!("mediaSession" in navigator) || typeof MediaMetadata === "undefined") return;
+      var h1 = document.querySelector("h1");
+      try { navigator.mediaSession.metadata = new MediaMetadata({ title: document.title.split("|")[0].trim() || (h1 ? h1.textContent.replace(/\s+/g, " ").trim() : "Ruta del Alma"), artist: "Ruta del Alma", album: "Lector de voz" }); } catch (e) {}
+      function set(a, f) { try { navigator.mediaSession.setActionHandler(a, f); } catch (e) {} }
+      set("play", function () { if (state !== "playing") btn.play.click(); });
+      set("pause", function () { if (state === "playing") btn.play.click(); });
+      set("stop", function () { if (state !== "idle") btn.stop.click(); });
+      set("previoustrack", function () { if (!btn.prev.disabled) btn.prev.click(); });
+      set("nexttrack", function () { if (!btn.next.disabled) btn.next.click(); });
+    })();
+
+    /* ---- Vigilante: si el sistema corta o pausa la voz, se reanuda ---- */
+    function restartCurrent() {
+      var t = ++token;
+      synth.cancel(); synth.resume();
+      play(pos.b, pos.c, t);
+    }
+    function ensureSpeaking() {
+      if (state !== "playing") return;
+      if (synth.paused) synth.resume();
+      if (!synth.speaking && !synth.pending && Date.now() - lastStart > 1500) restartCurrent();
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") window.setTimeout(ensureSpeaking, 300);
+    });
+    window.addEventListener("pageshow", function () { window.setTimeout(ensureSpeaking, 300); });
+    window.addEventListener("focus", function () { window.setTimeout(ensureSpeaking, 300); });
 
     function openPanel(open, returnFocus) {
       panel.hidden = !open;
@@ -108,6 +243,15 @@
       root.classList.toggle("is-speaking", s === "playing");
       var label = s === "playing" ? "Pausar" : s === "paused" ? "Reanudar" : "Escuchar página";
       playLabel.textContent = label; btn.play.title = label;
+      headPrev.disabled = headNext.disabled = !active;
+      prog.hidden = !active;
+      if (s === "playing") {
+        startKeepAlive(); sessionState("playing");
+        if (!watchdog) watchdog = window.setInterval(ensureSpeaking, 2500);
+      } else {
+        releaseWake(); stopKeepAlive(); sessionState(s === "paused" ? "paused" : "none");
+        if (watchdog) { window.clearInterval(watchdog); watchdog = null; }
+      }
     }
 
     function chunk(text) {
@@ -133,7 +277,7 @@
         if (closed && !el.closest("summary")) return;
         var text, target = el;
         if (el.tagName === "IMG") {
-          if (!el.alt) return;
+          if (!el.alt || !prefs.images) return;
           text = "Imagen: " + el.alt; target = el.closest(".frame") || el;
         } else {
           if (el.querySelector("p,li,h3,dt,dd")) return;
@@ -141,7 +285,7 @@
           copy.querySelectorAll('[aria-hidden="true"]').forEach(function (n) { n.remove(); });
           text = copy.textContent.replace(/\s+/g, " ").trim();
         }
-        if (text) list.push({ el: target, chunks: chunk(text) });
+        if (text) list.push({ el: target, chunks: chunk(text), head: /^H[23]$/.test(el.tagName) });
       });
       return list;
     }
@@ -175,13 +319,21 @@
       if (c >= blocks[b].chunks.length) { play(b + 1, 0, t); return; }
       pos = { b: b, c: c };
       var u = new SpeechSynthesisUtterance(blocks[b].chunks[c]);
-      var voice = synth.getVoices().filter(function (v) { return v.lang.toLowerCase().indexOf("es") === 0; })[0];
+      var voice = voices.filter(function (v) { return v.voiceURI === prefs.voice; })[0] || voices[0];
       u.lang = "es-ES";
       if (voice) u.voice = voice;
       u.rate = parseFloat(rate.value) || 1;
-      u.onend = function () { play(b, c + 1, t); };
-      u.onerror = function () { if (t === token) stop("No se pudo continuar la lectura."); };
+      u.onend = function () { retries = 0; play(b, c + 1, t); };
+      u.onerror = function (e) {
+        if (t !== token) return;
+        var err = e && e.error;
+        if (err === "canceled" || err === "interrupted") return;   /* el vigilante reanuda si hace falta */
+        if (retries < 2) { retries++; window.setTimeout(function () { play(b, c, t); }, 400); }
+        else stop("No se pudo continuar la lectura.");
+      };
       mark(blocks[b].el);
+      prog.max = blocks.length; prog.value = b + 1;
+      lastStart = Date.now();
       synth.speak(u);
     }
 
@@ -215,13 +367,43 @@
     fab.addEventListener("click", function () { openPanel(true); });
     btn.close.addEventListener("click", function () { setPick(false); openPanel(false, true); });
     btn.play.addEventListener("click", function () {
-      if (state === "idle") { setPick(false); startAt(collect(main), 0, "Leyendo la página completa."); }
+      if (state === "idle") { setPick(false); startAt(collect(main), 0, "Leyendo la página completa." + ("wakeLock" in navigator ? " La pantalla seguirá encendida mientras dure la lectura." : "")); }
       else if (state === "playing") { synth.pause(); setState("paused"); status.textContent = "Lectura en pausa."; }
       else { synth.resume(); setState("playing"); status.textContent = "Lectura reanudada."; }
     });
     btn.next.addEventListener("click", function () { jump(pos.b + 1); });
     btn.prev.addEventListener("click", function () { jump(pos.c > 0 ? pos.b : pos.b - 1); });
     btn.stop.addEventListener("click", function () { stop("Lectura detenida."); });
+
+    function currentScope() {
+      var el = document.activeElement, s;
+      if (el && el !== main && main.contains(el)) { s = el.closest("main > section"); if (s) return s; }
+      /* elementsFromPoint: el propio panel del lector puede tapar ese punto en pantallas pequeñas */
+      var stack = document.elementsFromPoint(Math.floor(window.innerWidth / 2), Math.floor(window.innerHeight * 0.35));
+      for (var k = 0; k < stack.length; k++) {
+        s = main.contains(stack[k]) ? stack[k].closest("main > section") : null;
+        if (s) return s;
+      }
+      return main;
+    }
+    secBtn.addEventListener("click", function () {
+      setPick(false);
+      var scope = currentScope(), list = collect(scope);
+      if (!list.length) { status.textContent = "No hay texto que leer en este apartado."; return; }
+      startAt(list, 0, "Leyendo este apartado.");
+    });
+    function jumpHead(dir) {
+      var i, from = pos.b;
+      if (dir > 0) {
+        for (i = from + 1; i < blocks.length; i++) if (blocks[i].head) { jump(i); return; }
+        stop("No hay más apartados."); return;
+      }
+      if (!blocks[from].head) { i = from; while (i > 0 && !blocks[i].head) i--; jump(i); return; }
+      for (i = from - 1; i >= 0; i--) if (blocks[i].head) { jump(i); return; }
+      jump(0);
+    }
+    headNext.addEventListener("click", function () { jumpHead(1); });
+    headPrev.addEventListener("click", function () { jumpHead(-1); });
 
     document.addEventListener("selectionchange", function () {
       var t = String(window.getSelection() || "").trim();
@@ -245,12 +427,18 @@
     }, true);
 
     document.addEventListener("keydown", function (e) {
+      if (e.altKey && e.shiftKey && (e.key === "L" || e.key === "l")) {   /* Alt+Mayús+L: abrir y reproducir / pausar */
+        e.preventDefault();
+        if (panel.hidden) openPanel(true);
+        btn.play.click();
+        return;
+      }
       if (e.key !== "Escape" || panel.hidden) return;
       if (document.body.classList.contains("pick-mode")) setPick(false);
       else if (state !== "idle") stop("Lectura detenida.");
       else openPanel(false, true);
     });
-    window.addEventListener("pagehide", function () { synth.cancel(); });
+    window.addEventListener("pagehide", function () { synth.cancel(); releaseWake(); stopKeepAlive(); });
   }
 
   /* 4 · Ampliar imágenes (lightbox con <dialog>) -------------------------- */
@@ -269,16 +457,21 @@
     }
     function close() { dlg.close(); }
 
+    function describe(img) {
+      if (img.alt) return img.alt;
+      var fig = img.closest("figure"), cap = fig && fig.querySelector("figcaption");
+      return cap ? cap.textContent.replace(/\s+/g, " ").trim() : "sin descripción";
+    }
     document.querySelectorAll("main .frame img").forEach(function (img) {
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "zoom";
-      btn.setAttribute("aria-label", "Ampliar imagen: " + img.alt);
+      btn.setAttribute("aria-label", "Ampliar imagen: " + describe(img));
       img.parentNode.insertBefore(btn, img);
       btn.appendChild(img);
       btn.addEventListener("click", function () {
         big.src = largest(img);
-        big.alt = img.alt;
+        big.alt = describe(img);
         dlg.showModal();
       });
     });
@@ -438,6 +631,82 @@
     all(".band__media .frame, .figure .frame, .about__media .frame, .guardian .frame").forEach(function (el) { seen.observe(el); });
   }
 
+
+  /* 7 · Animaciones de scroll extra: lado de cada tarjeta, tarjetas sueltas escalonadas y «Volver arriba» */
+  function initScrollFx() {
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var all = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+    /* «Volver arriba»: aparece tras bajar más de una pantalla y mueve el foco al título */
+    var top = document.createElement("button");
+    top.type = "button"; top.className = "to-top"; top.hidden = true;
+    top.setAttribute("aria-label", "Volver al inicio de la página");
+    top.innerHTML = '<span aria-hidden="true">↑</span>';
+    document.body.appendChild(top);
+    var shown = false, tick = false;
+    function check() {
+      tick = false;
+      var on = window.scrollY > window.innerHeight * 1.2;
+      if (on === shown) return;
+      shown = on;
+      if (on) { top.hidden = false; window.requestAnimationFrame(function () { top.classList.add("is-on"); }); }
+      else { top.classList.remove("is-on"); window.setTimeout(function () { if (!shown) top.hidden = true; }, 380); }
+    }
+    window.addEventListener("scroll", function () { if (!tick) { tick = true; window.requestAnimationFrame(check); } }, { passive: true });
+    top.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      var h1 = document.querySelector("h1");
+      if (h1) { h1.setAttribute("tabindex", "-1"); h1.focus({ preventScroll: true }); }
+    });
+    check();
+
+    if (reduce) return;
+
+    /* Capa decorativa fija de cada capítulo (hilo, tallo, agua, rayos…): su aspecto lo define el CSS del
+       capítulo y lo único que hace aquí el script es publicar el progreso de lectura en --p (0 a 1). */
+    if (/(^|\s)theme-/.test(document.body.className)) {
+      var fx = document.createElement("div");
+      fx.className = "chapter-fx"; fx.setAttribute("aria-hidden", "true");
+      fx.innerHTML = '<span class="fx-a"></span><span class="fx-b"></span>';
+      document.body.appendChild(fx);
+      var fxTick = false;
+      var fxUpdate = function () {
+        fxTick = false;
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        fx.style.setProperty("--p", max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1).toFixed(4) : "0");
+      };
+      window.addEventListener("scroll", function () { if (!fxTick) { fxTick = true; window.requestAnimationFrame(fxUpdate); } }, { passive: true });
+      window.addEventListener("resize", fxUpdate);
+      fxUpdate();
+    }
+
+    /* Lado de la imagen en cada tarjeta (cambia según el tema y el ancho de pantalla) */
+    function sides() {
+      all(".band").forEach(function (b) {
+        var m = b.querySelector(".band__media"), t = b.querySelector(".band__text"), side;
+        if (!m || !t) side = "solo";
+        else if (Math.abs(m.offsetTop - t.offsetTop) > 40 && Math.abs(m.offsetLeft - t.offsetLeft) < 40) side = "stack";
+        else side = m.offsetLeft < t.offsetLeft ? "media-left" : "media-right";
+        if (b.getAttribute("data-side") !== side) b.setAttribute("data-side", side);
+      });
+    }
+    sides();
+    var rt = null;
+    window.addEventListener("resize", function () { window.clearTimeout(rt); rt = window.setTimeout(sides, 150); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(sides);
+    window.addEventListener("load", sides);
+
+    /* Tarjetas sueltas que no traían data-reveal: se revelan escalonadas al llegar a ellas */
+    var EXTRA = ".theory > li, .theory-cards > li, .wb, .exercise, .callout--center";
+    all(EXTRA).forEach(function (el, i) {
+      if (!el.hasAttribute("data-reveal") && el.getBoundingClientRect().top > window.innerHeight * 0.95) {
+        el.setAttribute("data-reveal", "");
+        var sib = Array.prototype.indexOf.call(el.parentNode.children, el);
+        el.style.setProperty("--d", (Math.min(sib, 6) * 0.08).toFixed(2) + "s");
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initMenu();
     initIndexPanel();
@@ -446,6 +715,7 @@
     initZoom();
     initCarousel();
     initVideoFacades();
+    initScrollFx();
     initMotion();
   });
 })();

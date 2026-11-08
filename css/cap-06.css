@@ -1,0 +1,71 @@
+/* Capítulo 06 · El Grano y la Paja de la Historia — trigo, paja y agua (solo se carga en capitulo-06-grano-y-paja.html) */
+.theme-grano {
+  --gold: #d2a92f;
+  --gold-text: #7a5a0a;      /* trigo tostado, contraste ≥ 6:1 sobre --bg */
+  --line: rgba(122, 90, 10, .28);
+  --water: #2d6f8f; --straw: #8d8a7e;
+}
+@media (prefers-color-scheme: dark) {
+  .theme-grano { --gold: #e8c65a; --gold-text: #efd27a; --line: rgba(239, 210, 122, .28); --water: #7ab8d4; --straw: #b8b4a4; }
+}
+.theme-grano .band:nth-child(even) .band__media { order: 0; }
+.theme-grano .band:nth-child(odd) .band__media { order: -1; }
+.theme-grano .band--solo .band__grid { grid-template-columns: minmax(0, 46rem); justify-content: center; }
+.theme-grano .frame { box-shadow: 0 10px 36px rgba(90, 70, 10, .2), 0 0 0 1px color-mix(in srgb, var(--gold) 50%, transparent); }
+.theme-grano .callout { background: linear-gradient(100deg, color-mix(in srgb, var(--gold) 14%, transparent), transparent 85%); }
+.theme-grano .callout[data-voice="liam"] { border-left-color: #3f6b4a; }
+.theme-grano .callout[data-voice="elara"] { border-left-color: #7a4a8a; }
+.theme-grano .callout[data-voice="roberto"] { border-left-color: var(--water); }
+.theme-grano .callout[data-voice="lucia"] { border-left-color: #b03a6a; }
+.theme-grano .ask { border-left: 3px solid var(--gold); }
+.theme-grano .band__num::before { content: "❂"; content: "❂" / ""; display: inline-block; margin-right: .5rem; color: var(--gold-text); }
+
+/* Grano frente a paja */
+.grano-paja { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.grano-paja > div { padding: 1rem 1.25rem; border-radius: 10px; }
+.grano-paja dt { margin: 0 0 .25rem; font: .8125rem var(--sans, sans-serif); letter-spacing: .14em; text-transform: uppercase; }
+.grano-paja dd { margin: 0; }
+.grano-paja .grano { border: 1px solid var(--gold); border-top: 5px solid var(--gold); background: color-mix(in srgb, var(--gold) 14%, transparent); }
+.grano-paja .grano dt { color: var(--gold-text); }
+.grano-paja .paja { border: 1px dashed var(--straw); border-top: 5px dashed var(--straw); background: color-mix(in srgb, var(--straw) 12%, transparent); }
+.grano-paja .paja dt { color: color-mix(in srgb, var(--straw) 55%, var(--ink, #222)); }
+/* «Antes de cerrar el libro»: hecho, juicio y elección */
+.cierre-tres { list-style: none; margin: 1.5rem 0; padding: 0; display: grid; gap: .75rem; }
+.cierre-tres li { padding: .75rem 1rem; border-left: 5px solid var(--gold); border-radius: 6px; background: color-mix(in srgb, var(--gold) 10%, transparent); }
+.cierre-tres li[data-k="juicio"] { border-left: 5px dashed var(--straw); background: color-mix(in srgb, var(--straw) 12%, transparent); }
+.cierre-tres li[data-k="eleccion"] { border-left-color: var(--water); background: color-mix(in srgb, var(--water) 10%, transparent); }
+.cierre-tres strong { display: inline-block; margin-right: .35rem; font-variant: small-caps; letter-spacing: .06em; }
+
+/* ===== Ornamentos y animaciones: grano que cae, paja que vuela y agua que sube ===== */
+.theme-grano .hero { position: relative; isolation: isolate; }
+/* Grano dorado cayendo en vertical (::before) y paja gris arrastrada por el viento (::after) */
+.theme-grano .hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .6;
+  background-image: radial-gradient(ellipse 3px 5px at 20% 15%, var(--gold) 90%, transparent), radial-gradient(ellipse 3px 5px at 65% 50%, var(--gold) 90%, transparent), radial-gradient(ellipse 2.5px 4px at 85% 80%, var(--gold) 90%, transparent), radial-gradient(ellipse 2.5px 4px at 40% 90%, var(--gold) 90%, transparent);
+  background-size: 210px 250px, 290px 330px, 240px 280px, 330px 380px;
+}
+.theme-grano .hero::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .35;
+  background-image: radial-gradient(ellipse 14px 1.4px at 30% 25%, var(--straw) 95%, transparent), radial-gradient(ellipse 11px 1.4px at 75% 55%, var(--straw) 95%, transparent), radial-gradient(ellipse 13px 1.4px at 10% 85%, var(--straw) 95%, transparent);
+  background-size: 280px 200px, 340px 240px, 300px 260px;
+}
+/* Marea que sube con el scroll: el pueblo sumergido va quedando bajo el agua */
+.theme-grano .chapter-fx .fx-a { left: 0; right: 0; bottom: 0; height: 26vh; transform-origin: bottom; transform: scaleY(var(--p, 0)); opacity: .9;
+  background: linear-gradient(to top, color-mix(in srgb, var(--water) 38%, transparent), color-mix(in srgb, var(--water) 6%, transparent)); }
+.theme-grano .chapter-fx .fx-b { left: 0; right: 0; bottom: 0; height: 10px; opacity: calc(var(--p, 0) * 3);
+  transform: translateY(calc(var(--p, 0) * -26vh + 5px));
+  background: radial-gradient(circle at 10px 100%, transparent 7px, var(--water) 7.5px 8.5px, transparent 9px) 0 0 / 20px 10px repeat-x; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gr-fall { from { background-position: 0 -250px, 0 -330px, 0 -280px, 0 -380px; } to { background-position: 0 0, 0 0, 0 0, 0 0; } }
+  @keyframes gr-wind { from { background-position: 0 0, 0 0, 0 0; } to { background-position: 280px 0, 340px 0, 300px 0; } }
+  @keyframes gr-wave { to { background-position: 20px 0; } }
+  .theme-grano .hero::before { animation: gr-fall 22s linear infinite; }
+  .theme-grano .hero::after { animation: gr-wind 16s linear infinite; }
+  .theme-grano .chapter-fx .fx-b { animation: gr-wave 2.4s linear infinite; }
+  .js .theme-grano .grano-paja[data-reveal] .grano { transform: translateX(-30px); transition: transform .9s .2s cubic-bezier(.2, .7, .2, 1); }
+  .js .theme-grano .grano-paja[data-reveal] .paja { transform: translateX(30px) rotate(1.5deg); transition: transform 1.2s .35s cubic-bezier(.2, .7, .2, 1); }
+  .js .theme-grano .grano-paja[data-reveal].is-visible .grano, .js .theme-grano .grano-paja[data-reveal].is-visible .paja { transform: none; }
+}
+
+.theme-grano .area-tag { display: block; margin-top: .5rem; color: var(--gold-text); }
+.theme-grano .cierre-h { margin: 1.5rem 0 .5rem; font: 400 1.25rem var(--serif, serif); color: var(--gold-text); }
