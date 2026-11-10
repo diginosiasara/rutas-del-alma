@@ -1,0 +1,38 @@
+/* Capítulo 08 · Sueños Paralelos y Revelaciones Internas — noche índigo, estrellas y bruma (solo en capitulo-08-suenos.html) */
+.theme-suenos { --gold: #8f7fd6; --gold-text: #463a8f; --line: rgba(70, 58, 143, .28); }
+@media (prefers-color-scheme: dark) { .theme-suenos { --gold: #b3a6f0; --gold-text: #c9bdf8; --line: rgba(201, 189, 248, .28); } }
+.theme-suenos .band:nth-child(even) .band__media { order: 0; }
+.theme-suenos .band:nth-child(odd) .band__media { order: -1; }
+.theme-suenos .band--solo .band__grid { grid-template-columns: minmax(0, 46rem); justify-content: center; }
+.theme-suenos .callout { background: linear-gradient(100deg, color-mix(in srgb, var(--gold) 16%, transparent), transparent 85%); }
+.theme-suenos .callout[data-voice="liam"] { border-left-color: #3f6b4a; } .theme-suenos .callout[data-voice="elara"] { border-left-color: #7a4a8a; }
+.theme-suenos .frame { box-shadow: 0 12px 40px rgba(40, 30, 100, .25), 0 0 0 1px color-mix(in srgb, var(--gold) 55%, transparent); border-radius: 22px; }
+.theme-suenos .band__num::before { content: "☾"; content: "☾" / ""; display: inline-block; margin-right: .5rem; color: var(--gold-text); }
+.theme-suenos .steps { margin: 1rem 0; padding-left: 1.25rem; } .theme-suenos .band__sub { margin: 1rem 0 .25rem; font: 500 1.125rem var(--serif, serif); color: var(--gold-text); }
+
+/* ===== Ornamentos y animaciones: estrellas que titilan, bruma que deriva y luna que baja ===== */
+.theme-suenos .hero { position: relative; isolation: isolate; overflow: hidden; }
+.theme-suenos .hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .8;
+  background-image: radial-gradient(circle at 12% 22%, var(--gold) 0 1.5px, transparent 2.5px), radial-gradient(circle at 48% 12%, var(--gold) 0 1px, transparent 2px), radial-gradient(circle at 78% 34%, var(--gold) 0 2px, transparent 3px), radial-gradient(circle at 33% 72%, var(--gold) 0 1px, transparent 2px), radial-gradient(circle at 88% 80%, var(--gold) 0 1.5px, transparent 2.5px);
+  background-size: 260px 240px, 310px 280px, 340px 300px, 290px 330px, 360px 320px;
+}
+.theme-suenos .hero::after { content: ""; position: absolute; inset: -10%; z-index: -1; pointer-events: none; opacity: .55;
+  background: radial-gradient(ellipse 40% 30% at 20% 80%, color-mix(in srgb, var(--gold) 30%, transparent), transparent 70%), radial-gradient(ellipse 35% 28% at 80% 25%, color-mix(in srgb, var(--gold) 24%, transparent), transparent 70%); filter: blur(18px); }
+/* Línea de constelación bajo cada título */
+.theme-suenos .section__head .title::after { content: ""; display: block; height: 8px; width: min(14rem, 70%); margin: .75rem auto 0; background: radial-gradient(circle, var(--gold) 0 2px, transparent 3px) 0 center / 28px 8px repeat-x; }
+/* Hilo de estrellas en el borde y una luna que baja con el scroll */
+.theme-suenos .chapter-fx .fx-a { right: 8px; top: 0; bottom: 0; width: 6px; transform-origin: top; transform: scaleY(var(--p, 0)); opacity: .8; background: radial-gradient(circle, var(--gold) 0 2px, transparent 3px) center 0 / 6px 22px repeat-y; }
+.theme-suenos .chapter-fx .fx-b { right: 2px; top: 0; font-size: 1.6rem; line-height: 1; color: var(--gold-text); text-shadow: 0 0 12px var(--gold); transform: translateY(calc(var(--p, 0) * (100vh - 2rem))) rotate(calc(var(--p, 0) * 60deg - 30deg)); }
+.theme-suenos .chapter-fx .fx-b::before { content: "☾"; content: "☾" / ""; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes sn-twinkle { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+  @keyframes sn-mist { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(4%, -3%, 0); } }
+  .theme-suenos .hero::before { animation: sn-twinkle 5s ease-in-out infinite; }
+  .theme-suenos .hero::after { animation: sn-mist 22s ease-in-out infinite alternate; }
+  /* Las imágenes emergen como un recuerdo al despertar: de borrosas y apagadas a nítidas */
+  .js .theme-suenos .band[data-reveal][data-side] .frame img { filter: blur(10px) saturate(.6) brightness(.9); transition: filter 1.6s .15s ease; }
+  .js .theme-suenos .band[data-reveal][data-side].is-visible .frame img { filter: none; }
+  .js .theme-suenos .section__head[data-reveal] .title::after { transform: scaleX(0); transition: transform 1.4s .4s ease; }
+  .js .theme-suenos .section__head[data-reveal].is-visible .title::after { transform: none; }
+}

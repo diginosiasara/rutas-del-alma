@@ -1,0 +1,40 @@
+/* Capítulo 09 · El Regreso de las Historias y el Circo de los Nómadas — carpas, banderines y antorchas (solo en capitulo-09-regreso-nomadas.html) */
+.theme-regreso { --gold: #d9822b; --gold-text: #8a2f1f; --line: rgba(138, 47, 31, .28);
+  --flags: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='26'%3E%3Cpath d='M2 0h28L16 24z' fill='%23c8553d'/%3E%3Cpath d='M34 0h28L48 24z' fill='%23e8b13a'/%3E%3Cpath d='M66 0h28L80 24z' fill='%232f8a8a'/%3E%3Cpath d='M0 1h96' stroke='%238a2f1f' stroke-width='1.5'/%3E%3C/svg%3E"); }
+@media (prefers-color-scheme: dark) { .theme-regreso { --gold: #f0a24a; --gold-text: #f4b98a; --line: rgba(244, 185, 138, .28); } }
+.theme-regreso .band:nth-child(even) .band__media { order: 0; }
+.theme-regreso .band:nth-child(odd) .band__media { order: -1; }
+.theme-regreso .band--solo .band__grid { grid-template-columns: minmax(0, 46rem); justify-content: center; }
+.theme-regreso .callout { background: linear-gradient(100deg, color-mix(in srgb, var(--gold) 16%, transparent), transparent 85%); }
+.theme-regreso .frame { box-shadow: 0 12px 36px rgba(120, 50, 20, .25), 0 0 0 1px color-mix(in srgb, var(--gold) 55%, transparent); }
+.theme-regreso .band__num::before { content: "✪"; content: "✪" / ""; display: inline-block; margin-right: .5rem; color: var(--gold-text); }
+
+/* ===== Ornamentos y animaciones: banderines, antorchas y foco de circo ===== */
+.theme-regreso .hero { position: relative; isolation: isolate; overflow: hidden; }
+/* Confeti de colores que cae despacio */
+.theme-regreso .hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .65;
+  background-image: conic-gradient(from 45deg at 50% 50%, #c8553d 0 25%, transparent 25%), conic-gradient(from 45deg at 50% 50%, #e8b13a 0 25%, transparent 25%), conic-gradient(from 45deg at 50% 50%, #2f8a8a 0 25%, transparent 25%);
+  background-size: 12px 12px, 12px 12px, 12px 12px; background-repeat: no-repeat; background-position: 15% 20%, 55% 50%, 85% 15%;
+}
+/* Resplandor de antorcha en la esquina inferior */
+.theme-regreso .hero::after { content: ""; position: absolute; left: -6rem; bottom: -6rem; width: 18rem; height: 18rem; z-index: -1; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 170, 60, .5), rgba(255, 120, 40, .18) 45%, transparent 70%); }
+/* Banderines sobre cada título */
+.theme-regreso .section__head::before { content: ""; display: block; height: 26px; width: min(24rem, 90%); margin: 0 auto .75rem; background: var(--flags) center top / 96px 26px repeat-x; transform-origin: top center; }
+/* Guirnalda de banderines que se despliega con el scroll, con una estrella que la recorre */
+.theme-regreso .chapter-fx .fx-a { left: 0; right: 0; top: 3.5rem; height: 26px; background: var(--flags) 0 0 / 96px 26px repeat-x; clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0); opacity: .9; }
+.theme-regreso .chapter-fx .fx-b { left: 0; top: 3.5rem; font-size: 1.1rem; line-height: 1; color: var(--gold-text); transform: translateX(calc(var(--p, 0) * (100vw - 1.5rem))); }
+.theme-regreso .chapter-fx .fx-b::before { content: "✪"; content: "✪" / ""; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rg-confetti { from { background-position: 15% -5%, 55% -20%, 85% -10%; } to { background-position: 25% 105%, 45% 120%, 75% 110%; } }
+  @keyframes rg-torch { 0%, 100% { opacity: .75; transform: scale(1); } 40% { opacity: 1; transform: scale(1.08); } 70% { opacity: .85; transform: scale(.96); } }
+  @keyframes rg-sway { from { transform: rotate(-1.2deg); } to { transform: rotate(1.2deg); } }
+  .theme-regreso .hero::before { animation: rg-confetti 18s linear infinite; }
+  .theme-regreso .hero::after { animation: rg-torch 2.6s ease-in-out infinite; }
+  .theme-regreso .section__head::before { animation: rg-sway 4s ease-in-out infinite alternate; }
+  /* Las imágenes se descubren con un foco de circo */
+  .js .theme-regreso .band[data-reveal][data-side] .frame { clip-path: circle(0% at 50% 50%); transition: clip-path 1.3s .2s cubic-bezier(.3, .7, .2, 1); }
+  .js .theme-regreso .band[data-reveal][data-side].is-visible .frame { clip-path: circle(80% at 50% 50%); }
+}
+@media print { .theme-regreso .band .frame { clip-path: none !important; } }
