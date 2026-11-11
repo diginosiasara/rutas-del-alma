@@ -1,0 +1,79 @@
+/* Capítulo 04 · Las Llaves del Pensamiento — amatista y seis sombreros (solo se carga en capitulo-04-las-llaves.html) */
+.theme-llaves {
+  --gold: #a98bd6;
+  --gold-text: #5b3f8c;      /* amatista, contraste ≥ 7:1 sobre --bg */
+  --line: rgba(91, 63, 140, .28);
+  /* Los seis sombreros (solo decorativos: cada sombrero también se nombra con texto) */
+  --hat-blanco: #9aa3ad; --hat-rojo: #b03a3a; --hat-negro: #2f2f36;
+  --hat-amarillo: #c99a1a; --hat-verde: #3f8a4a; --hat-azul: #2f62a8;
+}
+@media (prefers-color-scheme: dark) {
+  .theme-llaves { --gold: #b9a0e3; --gold-text: #cdb8f0; --line: rgba(205, 184, 240, .28);
+    --hat-blanco: #e6e9ee; --hat-rojo: #e27a7a; --hat-negro: #8a8a99; --hat-amarillo: #e8c55a; --hat-verde: #7cc58a; --hat-azul: #7aa6e6; }
+}
+/* Alternancia de imagen y texto, como el resto de capítulos */
+.theme-llaves .band:nth-child(even) .band__media { order: 0; }
+.theme-llaves .band:nth-child(odd) .band__media { order: -1; }
+/* Bloques sin imagen: una sola columna centrada y legible */
+.theme-llaves .band--solo .band__grid { grid-template-columns: minmax(0, 46rem); justify-content: center; }
+/* Cada sombrero marca su bloque con una franja de color (el nombre va siempre en el texto) */
+.theme-llaves [data-hat="blanco"] { --hat: var(--hat-blanco); } .theme-llaves [data-hat="rojo"] { --hat: var(--hat-rojo); }
+.theme-llaves [data-hat="negro"] { --hat: var(--hat-negro); } .theme-llaves [data-hat="amarillo"] { --hat: var(--hat-amarillo); }
+.theme-llaves [data-hat="verde"] { --hat: var(--hat-verde); } .theme-llaves [data-hat="azul"] { --hat: var(--hat-azul); }
+.theme-llaves .band[data-hat] .band__text { border-left: 6px solid var(--hat); padding-left: 1.25rem; }
+/* Preguntas como llaves */
+.theme-llaves .ask { border-left: 3px solid var(--gold); }
+.theme-llaves .ask::before { content: "🗝 "; content: "🗝 " / ""; font-style: normal; }
+.theme-llaves .callout { background: linear-gradient(100deg, color-mix(in srgb, var(--gold) 14%, transparent), transparent 85%); }
+.theme-llaves .frame { box-shadow: 0 10px 36px rgba(60, 30, 110, .18), 0 0 0 1px color-mix(in srgb, var(--gold) 45%, transparent); }
+/* Teorías */
+.theory { list-style: none; counter-reset: hat; padding: 0; margin: 2rem 0; display: grid; gap: 1rem; }
+.theory li { counter-increment: hat; position: relative; padding: 1rem 1.25rem 1rem 3.5rem; border: 1px solid var(--line); border-left: 6px solid var(--hat); border-radius: 10px; }
+.theory li::before { content: counter(hat); position: absolute; left: 1rem; top: 1rem; width: 1.75rem; height: 1.75rem; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold-text); font: .8125rem var(--sans); }
+.theory h3, .theory-cards h3 { margin: 0 0 .25rem; font-size: 1.125rem; }
+.theory__sub { font-weight: 400; color: var(--gold-text); }
+.theory p, .theory-cards p { margin: .25rem 0; }
+.theory-cards { list-style: none; padding: 0; margin: 2rem 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.theory-cards li { padding: 1rem 1.25rem; border: 1px solid var(--line); border-top: 6px solid var(--hat); border-radius: 10px; }
+.title--sm { font-size: clamp(1.375rem, 3vw, 1.75rem); }
+/* Workbook */
+.wb { margin: 2rem 0; padding: 1.25rem; border: 1px solid var(--line); border-left: 6px solid var(--hat); border-radius: 10px; }
+.wb h3 { margin: 0 0 .5rem; }
+.wb textarea { width: 100%; min-height: 8rem; padding: .75rem 1rem; font: 1rem/1.6 var(--serif); color: inherit; background: transparent; border: 1px solid var(--gold-text); border-radius: 8px; resize: vertical; }
+.wb textarea:focus-visible { outline: 3px solid var(--gold-text); outline-offset: 2px; }
+.wb__count { margin: .5rem 0 0; font-size: .875rem; opacity: .85; }
+.wb__actions { margin-top: 1.5rem; text-align: center; }
+@media (forced-colors: active) { .theory li, .theory-cards li, .wb, .band[data-hat] .band__text { border-color: CanvasText; } }
+
+/* Bloques con imagen apaisada encima del texto */
+.theme-llaves .band.band--stack .band__grid { grid-template-columns: minmax(0, 52rem); justify-content: center; }
+.theme-llaves .band.band--stack .band__media { order: -1; width: 100%; margin-bottom: 1.5rem; }
+.theme-llaves .band.band--stack .frame { padding: .75rem; }
+
+/* ===== Ornamentos y animaciones · Capítulo 4: llaves, sombreros y preguntas ===== */
+.theme-llaves .hero { position: relative; isolation: isolate; }
+/* Interrogantes que flotan en la portada */
+.theme-llaves .hero::before, .theme-llaves .hero::after {
+  content: "? ¿ ?"; content: "? ¿ ?" / ""; position: absolute; z-index: -1; pointer-events: none; font: 700 5rem/1 var(--serif, serif); letter-spacing: 1.5rem; color: var(--gold); opacity: .14;
+}
+.theme-llaves .hero::before { top: 8%; left: 2%; }
+.theme-llaves .hero::after { content: "¿ ? ¿"; content: "¿ ? ¿" / ""; bottom: 6%; right: 2%; }
+/* Llave en el número de cada bloque: gira al aparecer, como al abrir una cerradura */
+.theme-llaves .band__num::before { content: "⚿"; content: "⚿" / ""; display: inline-block; margin-right: .5rem; color: var(--hat, var(--gold-text)); }
+/* Barra de los seis sombreros que se despliega con el scroll, con una llave que gira */
+.theme-llaves .chapter-fx .fx-a { right: 0; top: 0; bottom: 0; width: 5px; transform-origin: top; transform: scaleY(var(--p, 0));
+  background: linear-gradient(to bottom, #e6e9ee 0 16.6%, #b03a3a 16.6% 33.3%, #2f2f36 33.3% 50%, #c99a1a 50% 66.6%, #3f8a4a 66.6% 83.3%, #2f62a8 83.3%); }
+.theme-llaves .chapter-fx .fx-b { right: 9px; top: 0; font-size: 1.15rem; line-height: 1; color: var(--gold-text);
+  transform: translateY(calc(var(--p, 0) * (100vh - 1.5rem))) rotate(calc(var(--p, 0) * 1440deg)); }
+.theme-llaves .chapter-fx .fx-b::before { content: "⚿"; content: "⚿" / ""; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ll-bob { from { transform: translateY(-.6rem) rotate(-3deg); } to { transform: translateY(.9rem) rotate(3deg); } }
+  .theme-llaves .hero::before { animation: ll-bob 7s ease-in-out infinite alternate; }
+  .theme-llaves .hero::after { animation: ll-bob 9s 1s ease-in-out infinite alternate-reverse; }
+  .js .theme-llaves .band[data-reveal] .band__num::before { transform: rotate(-100deg); transition: transform .9s .5s cubic-bezier(.3, .8, .3, 1.2); }
+  .js .theme-llaves .band[data-reveal].is-visible .band__num::before { transform: none; }
+  /* Las imágenes apaisadas se abren como dos puertas */
+  .js .theme-llaves .band--stack[data-reveal] .frame { clip-path: inset(0 50% 0 50%); transition: clip-path 1.3s .2s cubic-bezier(.3, .7, .2, 1); }
+  .js .theme-llaves .band--stack[data-reveal].is-visible .frame { clip-path: inset(0); }
+}
+@media print { .theme-llaves .band--stack .frame { clip-path: none !important; } }

@@ -1,0 +1,90 @@
+/* Animaciones al scroll (todas las páginas).
+   Se suman a las de styles.css (aparición, parallax, barra de progreso). Todo está dentro de
+   prefers-reduced-motion: no-preference, solo mueve transform/opacity/filter y, si JS falla,
+   el contenido queda visible. */
+
+.zoom { overflow: hidden; }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* 1 · Entrada direccional de cada tarjeta: el texto llega desde el lado opuesto a la imagen */
+  .js .band[data-reveal][data-side] .band__text { opacity: 0; transform: none; transition: opacity .7s .05s ease; }
+  .js .band[data-reveal][data-side] .band__text > * {
+    transform: translate3d(var(--tx, 0), 22px, 0);
+    transition: transform .85s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--i, 0) * 70ms + .12s);
+  }
+  .js .band[data-reveal][data-side="media-left"] { --tx: 38px; --mx: -56px; }
+  .js .band[data-reveal][data-side="media-right"] { --tx: -38px; --mx: 56px; }
+  .js .band[data-reveal][data-side="stack"], .js .band[data-reveal][data-side="solo"] { --tx: 0px; --mx: 0px; }
+  .js .band[data-reveal][data-side] .band__media {
+    opacity: 0; transform: translate3d(var(--mx, 0), 0, 0) scale(.95);
+    transition: opacity .9s .1s ease, transform 1s .1s cubic-bezier(.2, .7, .2, 1);
+  }
+  .js .band[data-reveal][data-side].is-visible .band__text { opacity: 1; }
+  .js .band[data-reveal][data-side].is-visible .band__text > *,
+  .js .band[data-reveal][data-side].is-visible .band__media { opacity: 1; transform: none; }
+  .band__text > :nth-child(1) { --i: 0; } .band__text > :nth-child(2) { --i: 1; } .band__text > :nth-child(3) { --i: 2; }
+  .band__text > :nth-child(4) { --i: 3; } .band__text > :nth-child(5) { --i: 4; } .band__text > :nth-child(6) { --i: 5; }
+  .band__text > :nth-child(7) { --i: 6; } .band__text > :nth-child(8) { --i: 7; } .band__text > :nth-child(n+9) { --i: 8; }
+
+  /* 2 · Cabeceras de sección: etiqueta, título y entradilla entran en cascada */
+  .js .section__head[data-reveal] .eyebrow, .js .section__head[data-reveal] .title, .js .section__head[data-reveal] .lead {
+    transform: translateY(16px); transition: transform .8s cubic-bezier(.2, .7, .2, 1);
+  }
+  .js .section__head[data-reveal] .title { filter: blur(6px); transition-property: transform, filter; transition-duration: .8s, 1s; transition-delay: .12s; }
+  .js .section__head[data-reveal] .lead { transition-delay: .26s; }
+  .js .section__head[data-reveal].is-visible .eyebrow, .js .section__head[data-reveal].is-visible .title, .js .section__head[data-reveal].is-visible .lead { transform: none; filter: none; }
+
+  /* 3 · Tarjetas sueltas: ejercicios, teorías y respuestas del taller aparecen escalonadas */
+  .js .exercise[data-reveal], .js .theory > li[data-reveal], .js .theory-cards > li[data-reveal], .js .wb[data-reveal] { transform: translateY(28px) scale(.985); }
+  .js .exercise[data-reveal].is-visible, .js .theory > li[data-reveal].is-visible, .js .theory-cards > li[data-reveal].is-visible, .js .wb[data-reveal].is-visible { transform: none; }
+
+
+  /* 5 · Botón «Volver arriba» */
+  .to-top { transition: opacity .35s ease, transform .35s ease; }
+  .to-top:not(.is-on) { opacity: 0; transform: translateY(12px); }
+
+  /* 6 · Alternativa para navegadores sin animación ligada al scroll: la imagen se asienta al aparecer */
+  @supports not (animation-timeline: view()) {
+    .js .band[data-reveal][data-side] .frame img, .js .figure[data-reveal] .frame img { transform: scale(1.1); transition: transform 1.6s .15s cubic-bezier(.2, .7, .2, 1); }
+    .js .band[data-reveal][data-side].is-visible .frame img, .js .figure[data-reveal].is-visible .frame img { transform: none; }
+  }
+
+  /* 7 · Con animación ligada al scroll (Chrome, Edge, Safari reciente): sigue el desplazamiento */
+  @supports (animation-timeline: view()) {
+    @keyframes fx-settle { from { scale: 1.14; filter: saturate(.8) brightness(.88); } to { scale: 1; filter: none; } }
+    @keyframes fx-cover-out { from { opacity: 1; translate: 0 0; scale: 1; } to { opacity: .35; translate: 0 -48px; scale: .94; } }
+    @keyframes fx-drift { from { translate: 0 -48px; } to { translate: 0 48px; } }
+    @keyframes fx-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .band__media .frame img, .figure .frame img {
+      animation: fx-settle linear both; animation-timeline: view(); animation-range: entry 0% cover 45%;
+    }
+    .hero__cover { animation: fx-cover-out linear both; animation-timeline: view(); animation-range: exit 10% exit 90%; }
+    .section > .deco { animation: fx-drift linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    .section__head .rule { transform-origin: left; }
+    /* La barra de lectura se pinta con el scroll del documento, sin JS */
+    .scroll-progress { animation: fx-grow linear both; animation-timeline: scroll(root); }
+  }
+}
+
+/* Botón «Volver arriba» (estructura; el movimiento está arriba) */
+.to-top {
+  position: fixed; left: max(.75rem, env(safe-area-inset-left, 0px)); bottom: max(.75rem, env(safe-area-inset-bottom, 0px)); z-index: 56;
+  display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 1px solid var(--gold-text, currentColor);
+  border-radius: 50%; background: var(--paper, #fff); color: var(--gold-text, currentColor); font: 1.25rem/1 var(--sans, sans-serif); cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+}
+.to-top[hidden] { display: none; }
+.to-top:hover { background: var(--gold-text, currentColor); color: var(--paper, #fff); }
+.to-top:focus-visible { outline: 3px solid var(--gold-text, currentColor); outline-offset: 3px; }
+
+/* Capa fija de ornamento de cada capítulo (la rellena el CSS del capítulo) */
+.chapter-fx { position: fixed; inset: 0; z-index: 29; pointer-events: none; }
+.chapter-fx > span { position: absolute; display: block; }
+@media print { .chapter-fx { display: none; } }
+
+@media print {
+  .to-top { display: none; }
+  [data-reveal], [data-reveal] *, .band__text > *, .band__media, .hero__cover, .deco { opacity: 1 !important; transform: none !important; translate: none !important; filter: none !important; animation: none !important; }
+}
+@media (forced-colors: active) { .to-top { border-color: ButtonText; background: ButtonFace; color: ButtonText; } }

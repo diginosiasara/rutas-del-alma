@@ -1,0 +1,66 @@
+/* Capítulo 03 · La Luz Interior — amanecer dorado (solo se carga en capitulo-03-la-luz.html) */
+.theme-luz {
+  --gold: #d6a84e;
+  --gold-text: #86590f;      /* oro profundo, contraste ≥ 5.6:1 sobre --bg */
+  --line: rgba(134, 89, 15, .3);
+  --glow: rgba(240, 190, 90, .45);
+}
+@media (prefers-color-scheme: dark) {
+  .theme-luz { --gold: #e3b866; --gold-text: #f0c87a; --line: rgba(240, 200, 122, .28); --glow: rgba(240, 190, 90, .3); }
+}
+/* Título con halo de luz */
+.theme-luz h1 .h1__em { text-shadow: 0 0 28px var(--glow); }
+/* Marcos que brillan al pasar el ratón o recibir foco */
+.theme-luz .frame { box-shadow: 0 10px 40px rgba(0, 0, 0, .14), 0 0 0 1px color-mix(in srgb, var(--gold) 40%, transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .theme-luz .frame { transition: box-shadow .6s ease; }
+  .theme-luz .band:hover .frame, .theme-luz .exercise[open] .frame { box-shadow: 0 14px 60px var(--glow), 0 0 0 1px var(--gold); }
+}
+/* Preguntas de coaching como rayos de luz */
+.theme-luz .ask { border-left: 3px solid transparent; border-image: linear-gradient(to bottom, var(--gold), transparent) 1; }
+/* Recuadros con destello */
+.theme-luz .callout { border-left-width: 4px; background: linear-gradient(100deg, color-mix(in srgb, var(--gold) 16%, transparent), transparent 80%); }
+.theme-luz .callout--center { background: radial-gradient(ellipse at top, color-mix(in srgb, var(--gold) 20%, transparent), transparent 75%); }
+/* Estrella en el número de cada bloque y en el cierre */
+.theme-luz .band__num::before { content: "✦ "; content: "✦ " / ""; color: var(--gold); }
+.theme-luz .end-mark::before, .theme-luz .end-mark::after { content: " ✦ "; content: " ✦ " / ""; color: var(--gold-text); }
+/* Ejercicios numerados con luz */
+.theme-luz .exercise__body ol { list-style: none; counter-reset: paso; padding-left: 0; }
+.theme-luz .exercise__body ol li { counter-increment: paso; position: relative; padding-left: 2.5rem; }
+.theme-luz .exercise__body ol li::before { content: counter(paso); position: absolute; left: 0; top: .15rem; width: 1.75rem; height: 1.75rem; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--gold); font: .8125rem var(--sans); color: var(--gold-text); background: color-mix(in srgb, var(--gold) 14%, transparent); }
+.theme-luz .exercise[open] { border-color: var(--gold); box-shadow: 0 0 30px color-mix(in srgb, var(--gold) 20%, transparent); }
+.theme-luz .stats dd { text-shadow: 0 0 14px var(--glow); }
+
+/* ===== Ornamentos y animaciones · Capítulo 3: amanecer, rayos y destellos ===== */
+.theme-luz .hero { position: relative; isolation: isolate; }
+.theme-luz .hero__cover { isolation: isolate; }
+/* Rayos de sol detrás de la portada */
+.theme-luz .hero__cover::before {
+  content: ""; position: absolute; inset: -18%; z-index: -1; pointer-events: none; opacity: .8;
+  background: repeating-conic-gradient(from 0deg, rgba(240, 190, 90, .26) 0 6deg, transparent 6deg 18deg);
+  -webkit-mask-image: radial-gradient(circle, #000 25%, transparent 70%); mask-image: radial-gradient(circle, #000 25%, transparent 70%);
+}
+/* Destello que cruza cada lámina al llegar a ella */
+.theme-luz .band__media .frame { position: relative; overflow: hidden; }
+.theme-luz .band__media .frame::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-130%);
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 244, 205, .6) 50%, transparent 60%);
+}
+/* Estrellas a los lados de cada etiqueta de sección */
+.theme-luz .section__head .eyebrow::before, .theme-luz .section__head .eyebrow::after { content: "✦"; content: "✦" / ""; display: inline-block; margin-inline: .6rem; color: var(--gold); }
+/* Amanecer que se enciende al avanzar y un sol cuyos rayos giran con el scroll */
+.theme-luz .chapter-fx .fx-a { left: 0; right: 0; bottom: 0; height: 45vh; opacity: calc(.1 + var(--p, 0) * .8);
+  background: radial-gradient(ellipse at 50% 120%, rgba(255, 205, 110, .55), transparent 65%); }
+.theme-luz .chapter-fx .fx-b { top: -3.5rem; right: -3.5rem; width: 9rem; height: 9rem; border-radius: 50%; opacity: .75;
+  background: radial-gradient(circle, rgba(255, 214, 120, .95) 0 28%, transparent 29%), repeating-conic-gradient(rgba(240, 190, 90, .6) 0 8deg, transparent 8deg 24deg);
+  -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 72%); mask-image: radial-gradient(circle, #000 55%, transparent 72%);
+  transform: rotate(calc(var(--p, 0) * 540deg)); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lz-rays { to { transform: rotate(360deg); } }
+  @keyframes lz-shine { to { transform: translateX(130%); } }
+  @keyframes lz-twinkle { 0%, 100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+  .theme-luz .hero__cover::before { animation: lz-rays 90s linear infinite; }
+  .theme-luz .band.is-visible .frame::after { animation: lz-shine 1.6s .7s ease-out 1; }
+  .theme-luz .section__head .eyebrow::before { animation: lz-twinkle 3.2s ease-in-out infinite; }
+  .theme-luz .section__head .eyebrow::after { animation: lz-twinkle 3.2s 1.6s ease-in-out infinite; }
+}

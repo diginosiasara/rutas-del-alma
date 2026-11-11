@@ -1,0 +1,42 @@
+/* Capítulo 07 · El Libro Vivo y el Compás Dorado — tinta, bronce y brújula (solo en capitulo-07-libro-vivo.html) */
+.theme-libro {
+  --gold: #b8893a; --gold-text: #6e4b12; --line: rgba(110, 75, 18, .3);
+  --ink-dark: #1b1b22;
+}
+@media (prefers-color-scheme: dark) { .theme-libro { --gold: #d6a85a; --gold-text: #e6c283; --line: rgba(230, 194, 131, .28); --ink-dark: #0b0b10; } }
+.theme-libro .band:nth-child(even) .band__media { order: 0; }
+.theme-libro .band:nth-child(odd) .band__media { order: -1; }
+.theme-libro .band--solo .band__grid { grid-template-columns: minmax(0, 46rem); justify-content: center; }
+.theme-libro .callout[data-voice="liam"] { border-left-color: #3f6b4a; }
+.theme-libro .callout[data-voice="elara"] { border-left-color: #7a4a8a; }
+.theme-libro .callout { background: linear-gradient(100deg, color-mix(in srgb, var(--gold) 14%, transparent), transparent 85%); }
+.theme-libro .frame { box-shadow: 0 10px 36px rgba(40, 30, 10, .25), 0 0 0 1px color-mix(in srgb, var(--gold) 55%, transparent); }
+.theme-libro .band__num::before { content: "✥"; content: "✥" / ""; display: inline-block; margin-right: .5rem; color: var(--gold-text); }
+
+/* ===== Ornamentos y animaciones: aves negras, gota de tinta y brújula ===== */
+.theme-libro .hero { position: relative; isolation: isolate; overflow: hidden; }
+/* Bandada de aves negras que cruza la portada */
+.theme-libro .hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
+  background-image: radial-gradient(circle at 25% 0, transparent 8px, var(--ink-dark) 9px 10.5px, transparent 11px), radial-gradient(circle at 75% 0, transparent 8px, var(--ink-dark) 9px 10.5px, transparent 11px),
+                    radial-gradient(circle at 25% 0, transparent 6px, var(--ink-dark) 7px 8.5px, transparent 9px), radial-gradient(circle at 75% 0, transparent 6px, var(--ink-dark) 7px 8.5px, transparent 9px);
+  background-size: 40px 22px, 40px 22px, 30px 16px, 30px 16px;
+  background-repeat: no-repeat; background-position: 12% 18%, 12% 18%, 38% 30%, 38% 30%;
+}
+/* Gota de tinta que cae bajo cada título */
+.theme-libro .section__head .title::after { content: ""; display: block; width: 8px; height: 2.25rem; margin: .5rem auto 0; border-radius: 0 0 8px 8px; background: linear-gradient(var(--gold-text), var(--ink-dark)); transform-origin: top; }
+/* Brújula: la aguja gira con el scroll; una línea de tinta se oscurece al avanzar */
+.theme-libro .chapter-fx .fx-a { left: 0; top: 0; bottom: 0; width: 3px; transform-origin: top; transform: scaleY(var(--p, 0)); background: linear-gradient(var(--gold), var(--ink-dark)); opacity: .75; }
+.theme-libro .chapter-fx .fx-b { right: .75rem; top: 4rem; width: 3rem; height: 3rem; border: 2px solid var(--gold); border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--gold) 18%, var(--bg, #fff)) 0 60%, transparent 62%); box-shadow: 0 4px 14px rgba(0, 0, 0, .2); }
+.theme-libro .chapter-fx .fx-b::before, .theme-libro .chapter-fx .fx-b::after { content: ""; position: absolute; left: 50%; top: 50%; width: 3px; height: 42%; transform-origin: 50% 0; }
+.theme-libro .chapter-fx .fx-b::before { background: var(--gold-text); border-radius: 2px; transform: translateX(-50%) rotate(calc(var(--p, 0) * 720deg + 180deg)); }
+.theme-libro .chapter-fx .fx-b::after { background: var(--ink-dark); border-radius: 2px; transform: translateX(-50%) rotate(calc(var(--p, 0) * 720deg)); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lb-fly { from { background-position: -10% 18%, -10% 18%, 8% 30%, 8% 30%; } to { background-position: 110% 18%, 110% 18%, 128% 30%, 128% 30%; } }
+  @keyframes lb-drop { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.25); } }
+  .theme-libro .hero::before { animation: lb-fly 38s linear infinite; }
+  .js .theme-libro .section__head[data-reveal] .title::after { transform: scaleY(0); transition: transform 1.1s .5s cubic-bezier(.5, 0, .3, 1); }
+  .js .theme-libro .section__head[data-reveal].is-visible .title::after { transform: none; animation: lb-drop 4s 2s ease-in-out infinite; }
+  .js .theme-libro .band[data-reveal] .band__num::before { transform: rotate(-270deg); transition: transform 1.2s .5s cubic-bezier(.3, .8, .3, 1.1); }
+  .js .theme-libro .band[data-reveal].is-visible .band__num::before { transform: none; }
+}

@@ -1,0 +1,47 @@
+/* Capítulo 02 · El Sauce del Reflejo — agua y reflejo (solo se carga en capitulo-02-el-sauce.html) */
+.theme-sauce {
+  --gold: #7fb0b6;
+  --gold-text: #2a6670;      /* azul agua, contraste ≥ 5.9:1 sobre --bg */
+  --line: rgba(42, 102, 112, .3);
+}
+@media (prefers-color-scheme: dark) {
+  .theme-sauce { --gold: #8cc0c6; --gold-text: #9fd3d9; --line: rgba(159, 211, 217, .28); }
+}
+/* Recuadros con orilla de ola */
+.theme-sauce .callout { border-left: 0; border-radius: 12px; padding-bottom: 1.5rem; background:
+  radial-gradient(circle at 8px 100%, transparent 6px, color-mix(in srgb, var(--gold) 55%, transparent) 6.5px 7.5px, transparent 8px) bottom / 16px 8px repeat-x,
+  color-mix(in srgb, var(--gold) 10%, transparent); }
+/* Marcos en arco, como un espejo de agua */
+.theme-sauce .frame { border-radius: 999px 999px 14px 14px / 160px 160px 14px 14px; padding-top: 1.25rem; }
+.theme-sauce .frame img { border-radius: 999px 999px 8px 8px / 150px 150px 8px 8px; }
+.theme-sauce .ask { border-left: 0; border-bottom: 1px dashed var(--gold); padding: 0 0 .5rem; }
+.theme-sauce .exercise summary::after { border-radius: 50%; }
+/* Reflejo sutil bajo la imagen de cada tarjeta */
+.theme-sauce .band__media .frame::after { content: ""; display: block; height: .5rem; margin: .5rem 12% 0; border-radius: 50%; background: radial-gradient(ellipse at center, color-mix(in srgb, var(--gold) 45%, transparent), transparent 70%); }
+
+/* ===== Ornamentos y animaciones · Capítulo 2: agua, ondas y sauce ===== */
+.theme-sauce .band__media { position: relative; isolation: isolate; }
+/* Ondas que se expanden bajo cada lámina al llegar a ella */
+.theme-sauce .band__media::before {
+  content: ""; position: absolute; left: 50%; bottom: 3rem; width: 70%; aspect-ratio: 3 / 1; border: 2px solid var(--gold); border-radius: 50%;
+  transform: translateX(-50%) scale(.3); opacity: 0; pointer-events: none; z-index: -1;
+}
+/* Línea de agua bajo cada título */
+.theme-sauce .section__head::after {
+  content: ""; display: block; height: 10px; width: min(14rem, 70%); margin: .75rem auto 0;
+  background: radial-gradient(circle at 10px 0, transparent 7px, var(--gold) 7.5px 8.5px, transparent 9px) 0 0 / 20px 10px repeat-x;
+}
+/* Ramas de sauce que cuelgan del borde superior y se alargan al bajar */
+.theme-sauce .chapter-fx .fx-a {
+  top: 0; left: 0; right: 0; height: calc(5vh + var(--p, 0) * 26vh); transform-origin: top; opacity: .75;
+  background: repeating-linear-gradient(90deg, transparent 0 17px, color-mix(in srgb, var(--gold-text) 55%, transparent) 17px 18px, transparent 18px 40px, color-mix(in srgb, var(--gold-text) 38%, transparent) 40px 41px, transparent 41px 76px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent); mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes sa-ripple { 0% { opacity: .7; transform: translateX(-50%) scale(.3); } 100% { opacity: 0; transform: translateX(-50%) scale(1.5); } }
+  @keyframes sa-flow { to { background-position: 20px 0; } }
+  @keyframes sa-sway { from { transform: skewX(-1.4deg); } to { transform: skewX(1.4deg); } }
+  .theme-sauce .band.is-visible .band__media::before { animation: sa-ripple 3.2s .6s ease-out 2; }
+  .theme-sauce .section__head::after { animation: sa-flow 2.5s linear infinite; }
+  .theme-sauce .chapter-fx .fx-a { animation: sa-sway 6s ease-in-out infinite alternate; }
+}
