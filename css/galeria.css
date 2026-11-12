@@ -1,0 +1,43 @@
+/* Mapas e ilustraciones — galería y estampas de capítulo */
+.gal-fig { margin: 0; }
+.gal-fig--wide { margin-bottom: 2rem; }
+.gal-fig .frame img { width: 100%; height: auto; }
+.gal-two { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+@media (min-width: 48em) { .gal-two { grid-template-columns: 1fr 1fr; } }
+.gal-three { display: grid; gap: 1.5rem; grid-template-columns: 1fr; list-style: none; }
+@media (min-width: 48em) { .gal-three { grid-template-columns: repeat(3, 1fr); } }
+.gal-two--sheets { margin-top: 3rem; list-style: none; }
+.gal-sub { margin: 3.5rem 0 1.5rem; font: 300 1.6rem/1.2 var(--serif); text-align: center; }
+.gal-filters { justify-content: center; margin-bottom: 2rem; }
+
+/* personajes en tres estilos */
+.trio-list { display: grid; gap: 1.5rem; list-style: none; padding: 0; }
+.trio { padding: 1rem 1.25rem 1.25rem; border: 1px solid color-mix(in srgb, var(--ch-text) 30%, transparent); border-top: 5px solid var(--ch); border-radius: 16px; background: var(--paper); }
+.trio__name { font: 400 1.5rem/1.2 var(--serif); margin-bottom: 1rem; }
+.trio__name a { text-decoration: none; color: var(--ch-text); }
+.trio__name a:hover { text-decoration: underline; }
+.trio__figs { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; align-items: flex-end; }
+.trio__fig { margin: 0; flex: 0 1 11rem; text-align: center; }
+.trio__fig[hidden] { display: none; }
+.trio__fig .frame { padding: .25rem; box-shadow: none; }
+.trio__fig .frame img { width: 100%; height: 14rem; object-fit: contain; }
+.trio__fig figcaption { margin-top: .4rem; }
+
+/* estampas (pixel art) */
+.sticker-grid { display: grid; gap: 1rem; list-style: none; padding: 0; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); }
+.sticker-grid--lg { grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); gap: 1.25rem; }
+.sticker figure { margin: 0; text-align: center; }
+.sticker .frame { padding: .5rem; box-shadow: none; }
+.sticker .frame img { width: 100%; height: 8.5rem; object-fit: contain; }
+.sticker-grid--lg .frame img { height: 11rem; }
+.sticker figcaption { margin-top: .5rem; font: .875rem/1.35 var(--sans); color: var(--ink-soft); }
+.objcap { margin-top: 2.5rem; }
+.objcap__t { font: 400 1.35rem/1.3 var(--serif); margin-bottom: 1rem; }
+.objcap__t .label { display: block; color: var(--gold-text); }
+.objetos__more { margin-top: 2.5rem; text-align: center; }
+.creditos { color: var(--ink-soft); margin-top: 1rem; }
+.teaser-grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; list-style: none; padding: 0; margin-bottom: 2rem; }
+@media (min-width: 48em) { .teaser-grid { grid-template-columns: 1.4fr 1fr 1fr; } }
+.versiones__figs { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; }
+.versiones__figs figure { margin: 0; flex: 0 1 14rem; text-align: center; }
+.versiones__figs .frame img { width: 100%; height: 18rem; object-fit: contain; }
