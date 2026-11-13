@@ -488,3 +488,26 @@ html:has(dialog[open]) { overflow: hidden; }
 .footer-note { max-width: 42rem; margin-top: .75rem; color: var(--ink-soft); }
 .footer-note a { text-decoration: underline; }
 @media (min-width: 48em) { .guardians__grid > .guardian:last-child:nth-child(odd) { grid-column: 1 / -1; width: min(100%, 28rem); margin-inline: auto; } }
+
+/* ---------- Texto del libro (manuscrito) y material complementario ---------- */
+.prose--libro p { margin: 0 0 1.15em; line-height: 1.8; }
+.prose--libro .fabula { font-style: italic; margin-left: .25rem; padding-left: 1.1rem; border-left: 3px solid var(--gold, #c9a227); }
+.prose--libro ul { margin: 0 0 1.15em 1.2em; }
+.hero__cite { display: block; margin-top: .4rem; font-style: normal; font-size: .9em; opacity: .85; }
+.llevarte { margin-top: 2rem; padding: 1.25rem 1.5rem; border: 1px solid color-mix(in srgb, var(--gold, #c9a227) 45%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--gold, #c9a227) 8%, transparent); }
+.llevarte h3 { font-size: 1.15rem; margin-bottom: .6rem; }
+.llevarte ul { margin-left: 1.2em; }
+.ejercicios-libro { list-style: none; padding: 0; display: grid; gap: 1.1rem; counter-reset: none; }
+.ejercicios-libro .card { padding: 1.25rem 1.5rem; }
+.ejercicios-libro h3 { font-size: 1.15rem; margin-bottom: .5rem; }
+.ejercicios-libro .ej-n { display: inline-grid; place-items: center; width: 1.8rem; height: 1.8rem; margin-right: .4rem; border-radius: 50%; background: var(--gold, #c9a227); color: #fff; font: 600 .95rem/1 var(--sans, system-ui); }
+.complementario { margin-top: 3.5rem; border-top: 4px double color-mix(in srgb, currentColor 25%, transparent); }
+.complementario > summary { cursor: pointer; padding: 1.5rem 1rem 1rem; text-align: center; display: grid; gap: .35rem; }
+.complementario > summary::-webkit-details-marker { display: none; }
+.complementario > summary .complementario__t { font: 400 1.5rem/1.25 var(--serif, Georgia, serif); }
+.complementario > summary::after { content: "Mostrar u ocultar"; font: .75rem/1 var(--sans, system-ui); letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
+.complementario__note { max-width: 46rem; margin: 0 auto 2rem; padding: 0 1rem; text-align: center; opacity: .9; }
+.comp-gallery { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); }
+.comp-gallery .figure, .comp-gallery figure { margin: 0; }
+.bibliografia { list-style: none; padding: 0; display: grid; gap: .8rem; }
+.bibliografia li { padding: .8rem 1rem; border-left: 3px solid var(--gold, #c8a882); background: color-mix(in srgb, var(--gold, #c8a882) 8%, transparent); border-radius: 0 10px 10px 0; }
