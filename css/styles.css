@@ -483,3 +483,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .reader__opts { max-height: min(60vh, 26rem); overflow-y: auto; overscroll-behavior: contain; }
 .reader__btn:disabled { opacity: .45; cursor: not-allowed; }
 @media (forced-colors: active) { .reader__progress { border: 1px solid CanvasText; } }
+
+/* Nota al lector / aviso en el pie */
+.footer-note { max-width: 42rem; margin-top: .75rem; color: var(--ink-soft); }
+.footer-note a { text-decoration: underline; }
+@media (min-width: 48em) { .guardians__grid > .guardian:last-child:nth-child(odd) { grid-column: 1 / -1; width: min(100%, 28rem); margin-inline: auto; } }
