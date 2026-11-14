@@ -13,5 +13,5 @@ for p in pages:
     x.append(f'  <url><loc>{loc}</loc></url>')
 x.append('</urlset>')
 open('sitemap.xml', 'w', encoding='utf8').write('\n'.join(x) + '\n')
-open('robots.txt', 'w').write(f'User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n')
+open('robots.txt', 'w').write(f'User-agent: *\nAllow: /\nDisallow: /version-anterior/\nSitemap: {base}/sitemap.xml\n')
 print(f'sitemap.xml ({len(pages)} URLs) y robots.txt creados')

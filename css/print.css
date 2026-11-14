@@ -1,0 +1,12 @@
+/* Impresión limpia: sin menús, animaciones ni controles */
+@media print {
+  body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+  :where(.site-header, #site-nav, .nav-overlay, .reader, .a-fab, .a-panel, .a-ruler, .to-top, .deco, .fx, .leaf-divider, .hero__actions, .cap-nav, .video-grid, .yt-facade, .skip-link, .llamada__icon) { display: none !important; }
+  .llamada, .card, .guardian, .frame { box-shadow: none !important; border: 1px solid #999 !important; break-inside: avoid; background: #fff !important; }
+  .llamada::before, .llamada::after { display: none !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  .complementario > summary { display: none; }
+  section { break-inside: auto; }
+  h2, h3 { break-after: avoid; }
+  .ejercicios-libro .card, .llamada { break-inside: avoid; }
+}

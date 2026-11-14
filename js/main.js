@@ -553,7 +553,7 @@
       var f = e.target.closest(".yt-facade");
       if (!f) return;
       var ifr = document.createElement("iframe");
-      ifr.src = "https://www.youtube-nocookie.com/embed/" + f.getAttribute("data-yt") + "?rel=0&autoplay=1";
+      ifr.src = "https://www.youtube-nocookie.com/embed/" + f.getAttribute("data-yt") + "?rel=0&autoplay=1&cc_load_policy=1&hl=es&cc_lang_pref=es";
       ifr.title = f.getAttribute("data-title") + " — reproductor de YouTube";
       ifr.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
       ifr.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");

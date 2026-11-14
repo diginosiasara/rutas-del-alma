@@ -29,3 +29,10 @@
 ## 2026-11-14 (llamadas animadas por capítulo)
 - `css/llamadas.css`: citas de cierre, tarjetas de idea (reflexión), lecturas psicoanalíticas, avisos, «Para llevarte» y ejercicios con diseño y animación propios de cada capítulo (lámpara, brote, ondas, sol, llave, libro, espiga, brújula, luna y carpa con bombillas). Se adaptan al tema con la clase `theme-*` del `<body>`; solo usan transform/opacity y se desactivan con `prefers-reduced-motion`.
 - Letra capitular y hilo de luz animado en las fábulas del relato.
+
+## 2026-11-14 (menú y versión anterior)
+- Menú rediseñado (`css/menu.css`): grupos (El libro / El viaje / Personajes y atlas / Para llevar contigo), insignias con icono y color por capítulo, hilo que une prólogo y capítulos, página actual destacada, subapartados compactos y entrada escalonada. Se respeta `prefers-reduced-motion`.
+- `version-anterior/`: la web tal como estaba antes del manuscrito, completa y con todos sus enlaces internos; sustituye a los fragmentos de `docs/archivo-textos-web-anteriores/`. Enlazada desde el menú y desde el material complementario de cada capítulo.
+
+## 2026-11-14 (accesibilidad y continuidad de lectura)
+- Panel «Mi lectura», continuidad de lectura, navegación anterior/siguiente, CTA en portada, impresión limpia, texto sin justificar por defecto, contraste de acentos y subtítulos de vídeo (detalle en `docs/ACCESIBILIDAD.md`).

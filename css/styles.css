@@ -446,8 +446,8 @@ html:has(dialog[open]) { overflow: hidden; }
   .band:nth-child(even) .band__media { order: -1; }
   .figure { width: 75%; margin-block: 5rem; }
   .frame { padding: .75rem; }
-  .prose p { font-size: 1.125rem; text-align: justify; hyphens: auto; }
-  .band p, .card p, .closing__text { text-align: justify; hyphens: auto; }
+  .prose p { font-size: 1.125rem; text-align: left; }
+  .band p, .card p, .closing__text { text-align: left; }
   .closing .frame { width: 78%; }
   .ratings { grid-template-columns: 1fr 1fr; }
 }
@@ -511,3 +511,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .comp-gallery .figure, .comp-gallery figure { margin: 0; }
 .bibliografia { list-style: none; padding: 0; display: grid; gap: .8rem; }
 .bibliografia li { padding: .8rem 1rem; border-left: 3px solid var(--gold, #c8a882); background: color-mix(in srgb, var(--gold, #c8a882) 8%, transparent); border-radius: 0 10px 10px 0; }
+
+/* Aviso de la versión anterior (archivo) */
+.archivo-banner { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: center; justify-content: center; padding: .65rem 1rem; background: #3b2f12; color: #fff6dc; font: .85rem/1.4 var(--sans, system-ui); text-align: center; }
+.archivo-banner a { color: #ffd86b; font-weight: 600; text-underline-offset: .2em; }
