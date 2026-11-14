@@ -6,6 +6,7 @@
 - **Continuidad de lectura** (`js/progreso.js`): «Continuar leyendo (n %)» en la portada, capítulos marcados como leídos en el menú.
 - **Navegación anterior/siguiente** al final del prólogo y de cada capítulo.
 - **Portada** con botones «Comenzar a leer» y «Explorar el universo».
+- **Cuaderno personal** (`js/cuaderno.js`, `css/cuaderno.css`): cada ejercicio oficial tiene su campo «Mis notas» con contador, guardado automático (aviso «Guardado a las HH:MM»), descarga en .txt, copia de seguridad .json, importación, impresión y borrado con confirmación; la página del cuaderno muestra «Mi progreso» (n de 26). Aviso de privacidad y de almacenamiento bloqueado incluidos.
 - **Impresión limpia** (`css/print.css`): sin menús, animaciones ni controles.
 - **Lector de voz**: panel identificado como región con nombre accesible.
 - **Vídeos** de YouTube con subtítulos en español activados por defecto.
@@ -16,6 +17,5 @@
 - Lector de voz: resaltado por frase, lectura por frases, anuncio de cambios de apartado, explicación de las limitaciones en segundo plano.
 - Dislexia: separación silábica, glosario contextual, resúmenes de capítulo, fuente OpenDyslexic/Atkinson (hay que incluir los ficheros y revisar licencias).
 - Audio/LSE: transcripciones y subtítulos propios, vídeos en lengua de signos.
-- Cuaderno: exportar/importar respuestas, resumen por capítulo, indicador de guardado.
 - Chat IA «ALMA»: requiere backend/agente local y decisión sobre modelos (ver informe).
 - Modularizar `main.js`, plantillas de componentes comunes, PWA, canonical/sitemap con el dominio real.

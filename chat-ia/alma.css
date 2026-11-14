@@ -1,0 +1,68 @@
+/* ALMA — asistente del libro (botón con avatar + panel de chat) */
+.alma-fab { position: fixed; right: 1rem; bottom: 5.4rem; z-index: 72; width: 4.1rem; height: 4.1rem; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+.alma-fab__img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold-text, #7a5a36); background: #fff; box-shadow: 0 10px 26px -8px rgba(0, 0, 0, .5); transition: transform .3s ease, box-shadow .3s ease; }
+.alma-fab:hover .alma-fab__img { transform: scale(1.07) rotate(-3deg); }
+.alma-fab:focus-visible { outline: 3px solid var(--focus, #005fcc); outline-offset: 4px; }
+.alma-fab__dot { position: absolute; right: .1rem; bottom: .15rem; width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid var(--paper, #fff); background: #2e8b57; }
+.alma-fab::before { content: ""; position: absolute; inset: -.35rem; border-radius: 50%; border: 2px solid var(--gold-text, #7a5a36); opacity: 0; pointer-events: none; }
+.alma-fab[aria-expanded="true"] .alma-fab__img { box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold, #c8a882) 55%, transparent), 0 10px 26px -8px rgba(0,0,0,.5); }
+.alma-fab__x { position: absolute; inset: 0; display: none; place-items: center; border-radius: 50%; background: rgba(15, 30, 32, .72); color: #fff; font: 700 1.6rem/1 var(--sans, system-ui); }
+.alma-fab[aria-expanded="true"] .alma-fab__x { display: grid; }
+.alma-bubble { position: fixed; right: 5.9rem; bottom: 6.2rem; z-index: 72; max-width: 15rem; padding: .7rem 2rem .7rem .9rem; border-radius: 16px 16px 4px 16px; background: var(--paper, #fff); color: var(--ink, #132e33); border: 1px solid var(--line, #ccc); box-shadow: 0 14px 30px -14px rgba(0,0,0,.45); font: .9rem/1.4 var(--sans, system-ui); }
+.alma-bubble[hidden] { display: none; }
+.alma-bubble button { position: absolute; top: .2rem; right: .25rem; width: 1.8rem; height: 1.8rem; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 1.1rem; cursor: pointer; }
+
+.alma-panel { position: fixed; right: 1rem; bottom: 10.2rem; z-index: 73; display: flex; flex-direction: column; width: min(26rem, calc(100vw - 1.5rem)); height: min(34rem, calc(100vh - 12rem)); border: 1px solid var(--line, #ccc); border-radius: 20px; background: var(--paper, #fff); color: var(--ink, #132e33); box-shadow: 0 30px 70px -24px rgba(0, 0, 0, .55); overflow: hidden; font: .95rem/1.5 var(--sans, system-ui); }
+.alma-panel[hidden] { display: none; }
+.alma-head { display: flex; align-items: center; gap: .7rem; padding: .7rem .9rem; border-bottom: 1px solid var(--line, #ccc); background: linear-gradient(135deg, color-mix(in srgb, var(--gold, #c8a882) 22%, var(--paper, #fff)), var(--paper, #fff)); }
+.alma-head img { width: 2.6rem; height: 2.6rem; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-text, #7a5a36); background: #fff; }
+.alma-head__t { flex: 1; min-width: 0; }
+.alma-head h2 { font: 400 1.2rem/1.1 var(--serif, Georgia, serif); }
+.alma-chip { display: inline-block; margin-top: .15rem; padding: .05rem .5rem; border-radius: 999px; border: 1px solid var(--line, #ccc); font-size: .72rem; color: var(--ink-soft, #2f484c); }
+.alma-chip::before { content: ""; display: inline-block; width: .5rem; height: .5rem; margin-right: .35rem; border-radius: 50%; background: #c58b00; }
+.alma-chip[data-ok="1"]::before { background: #2e8b57; }
+.alma-ibtn { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border: 1px solid transparent; border-radius: 50%; background: transparent; color: inherit; font-size: 1.1rem; cursor: pointer; }
+.alma-ibtn:hover { background: color-mix(in srgb, var(--gold, #c8a882) 25%, transparent); }
+.alma-panel :focus-visible { outline: 3px solid var(--focus, #005fcc); outline-offset: 2px; }
+.alma-log { flex: 1; overflow: auto; padding: .9rem; display: flex; flex-direction: column; gap: .7rem; scroll-behavior: smooth; }
+.alma-msg { max-width: 92%; padding: .6rem .85rem; border-radius: 16px; overflow-wrap: anywhere; }
+.alma-msg p { margin: 0 0 .5em; } .alma-msg p:last-child { margin-bottom: 0; }
+.alma-msg--bot { align-self: flex-start; background: color-mix(in srgb, var(--gold, #c8a882) 16%, var(--paper, #fff)); border-bottom-left-radius: 4px; }
+.alma-msg--user { align-self: flex-end; background: var(--ink, #132e33); color: var(--paper, #fff); border-bottom-right-radius: 4px; }
+.alma-msg--err { align-self: stretch; background: color-mix(in srgb, #b3261e 9%, var(--paper, #fff)); border-left: 4px solid #b3261e; border-radius: 6px; }
+.alma-quote { margin: .4rem 0; padding: .45rem .7rem; border-left: 3px solid var(--gold-text, #7a5a36); background: color-mix(in srgb, var(--ink, #132e33) 6%, transparent); font-family: var(--body, Georgia, serif); font-size: .92rem; }
+.alma-src { margin-top: .5rem; font-size: .8rem; color: var(--ink-soft, #2f484c); }
+.alma-src a { display: inline-block; margin: .15rem .3rem 0 0; padding: .1rem .55rem; border: 1px solid var(--line, #ccc); border-radius: 999px; color: inherit; text-decoration: none; }
+.alma-src a:hover { background: color-mix(in srgb, var(--gold, #c8a882) 25%, transparent); }
+.alma-typing::after { content: "…"; animation: alma-blink 1s steps(2) infinite; }
+.alma-chips { display: flex; flex-wrap: wrap; gap: .4rem; padding: 0 .9rem .6rem; }
+.alma-chips button { padding: .35rem .7rem; border: 1px solid var(--line, #ccc); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: .85rem; cursor: pointer; }
+.alma-chips button:hover { background: color-mix(in srgb, var(--gold, #c8a882) 25%, transparent); }
+.alma-form { display: flex; gap: .5rem; align-items: flex-end; padding: .6rem .8rem .8rem; border-top: 1px solid var(--line, #ccc); }
+.alma-form textarea { flex: 1; min-height: 2.6rem; max-height: 7rem; padding: .55rem .7rem; border: 1.5px solid var(--line, #ccc); border-radius: 12px; background: var(--paper, #fff); color: inherit; font: inherit; resize: none; }
+.alma-send { padding: .6rem .9rem; border: 0; border-radius: 12px; background: var(--ink, #132e33); color: var(--paper, #fff); font: 600 .9rem var(--sans, system-ui); cursor: pointer; }
+.alma-send[data-stop="1"] { background: #b3261e; }
+.alma-foot { padding: 0 .9rem .6rem; color: var(--muted, #4f6165); font-size: .75rem; }
+/* ajustes */
+.alma-set { position: absolute; inset: 3.9rem 0 0 0; z-index: 2; overflow: auto; padding: .9rem 1rem 1.2rem; background: var(--paper, #fff); }
+.alma-set[hidden] { display: none; }
+.alma-set h3 { font: 400 1.1rem var(--serif, Georgia, serif); margin-bottom: .6rem; }
+.alma-set label { display: block; margin-top: .65rem; font: 600 .75rem/1.2 var(--sans, system-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #4f6165); }
+.alma-set select, .alma-set input[type=text], .alma-set input[type=number] { width: 100%; margin-top: .25rem; padding: .5rem .6rem; border: 1.5px solid var(--line, #ccc); border-radius: 10px; background: var(--paper, #fff); color: inherit; font: .95rem var(--sans, system-ui); text-transform: none; letter-spacing: 0; }
+.alma-set .alma-row { display: flex; gap: .5rem; align-items: flex-start; margin-top: .75rem; text-transform: none; letter-spacing: 0; font: .9rem var(--sans, system-ui); color: inherit; }
+.alma-set button.alma-b { margin: .8rem .5rem 0 0; padding: .5rem .9rem; border: 1.5px solid var(--ink, #132e33); border-radius: 999px; background: transparent; color: inherit; font: 600 .85rem var(--sans, system-ui); cursor: pointer; }
+.alma-set button.alma-b:hover { background: var(--ink, #132e33); color: var(--paper, #fff); }
+.alma-note { margin-top: .8rem; font-size: .82rem; color: var(--ink-soft, #2f484c); }
+@media (max-width: 40em) { .alma-panel { right: .5rem; left: .5rem; width: auto; bottom: 9.6rem; height: min(34rem, calc(100vh - 11rem)); } .alma-bubble { display: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .alma-fab__img { animation: alma-bob 4s ease-in-out infinite; }
+  .alma-fab[aria-expanded="false"]::before { animation: alma-ring 3s ease-out infinite; }
+  .alma-panel:not([hidden]) { animation: alma-in .28s cubic-bezier(.2, .8, .2, 1); }
+  .alma-msg { animation: alma-msg .25s ease-out; }
+}
+@keyframes alma-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes alma-ring { 0% { transform: scale(.9); opacity: .6; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes alma-in { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes alma-msg { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes alma-blink { 50% { opacity: 0; } }
+@media print { .alma-fab, .alma-panel, .alma-bubble { display: none !important; } }

@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "proyecto": "Rutas del Alma",
+  "nota": "Catálogo orientativo. Comprueba disponibilidad, licencia y requisitos de hardware de cada modelo antes de recomendarlo. No se distribuyen pesos de modelos con este proyecto.",
+  "modelos": [
+    { "id": "alma-general", "proveedor": "ollama", "modelo": "qwen3:8b", "tipo": "chat", "idioma": ["es"], "recomendado": true },
+    { "id": "alma-ligero", "proveedor": "ollama", "modelo": "gemma3:4b", "tipo": "chat", "idioma": ["es"], "recomendado": false }
+  ]
+}

@@ -1,0 +1,22 @@
+/* Cuaderno personal: respuestas a los ejercicios */
+.cn-box { margin-top: 1rem; }
+.cn-label { display: block; margin-bottom: .3rem; font: 600 .78rem/1.2 var(--sans, system-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.cn-box textarea { width: 100%; min-height: 6.5rem; padding: .75rem .9rem; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); font: 1rem/1.6 var(--body); resize: vertical; }
+.cn-box textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.cn-count { margin-top: .25rem; font: .8rem var(--sans, system-ui); color: var(--muted); text-align: right; }
+.cn-tools { margin-top: 1.5rem; padding: 1.1rem 1.25rem; border: 1px dashed var(--line); border-radius: 14px; }
+.cn-privacy { font-size: .92rem; color: var(--ink-soft); }
+.cn-warn { margin-bottom: .6rem; padding: .6rem .8rem; border-left: 4px solid #b3261e; background: color-mix(in srgb, #b3261e 8%, var(--paper)); font-size: .92rem; }
+.cn-warn::before { content: "\26A0\00a0Aviso: "; font-weight: 700; }
+.cn-buttons { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .8rem; }
+.cn-buttons button { padding: .55rem .95rem; border: 1.5px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); font: 600 .88rem var(--sans, system-ui); cursor: pointer; }
+.cn-buttons button:hover { background: var(--ink); color: var(--paper); }
+.cn-buttons button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.cn-buttons button[data-act="clear"] { border-color: #b3261e; color: #b3261e; }
+.cn-buttons button[data-act="clear"]:hover { background: #b3261e; color: #fff; }
+.cn-status { min-height: 1.4em; margin-top: .6rem; font: .88rem var(--sans, system-ui); color: var(--ink-soft); }
+.cn-resumen progress { width: 100%; height: .9rem; margin: .4rem 0 1rem; accent-color: var(--gold-text); }
+.cn-lista { list-style: none; padding: 0; display: grid; gap: .4rem; }
+.cn-lista li { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem .8rem; border: 1px solid var(--line); border-radius: 10px; }
+.cn-lista span { font-weight: 600; white-space: nowrap; }
+@media print { .cn-box textarea { border: 1px solid #666; min-height: 5rem; } .cn-tools, .cn-count { display: none !important; } }

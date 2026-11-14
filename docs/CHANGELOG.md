@@ -36,3 +36,10 @@
 
 ## 2026-11-14 (accesibilidad y continuidad de lectura)
 - Panel «Mi lectura», continuidad de lectura, navegación anterior/siguiente, CTA en portada, impresión limpia, texto sin justificar por defecto, contraste de acentos y subtítulos de vídeo (detalle en `docs/ACCESIBILIDAD.md`).
+
+## 2026-11-14 (cuaderno personal)
+- Campos de respuesta en los 26 ejercicios del libro con guardado local, exportación .txt/.json, importación, impresión, borrado y panel «Mi progreso» en la página del cuaderno.
+
+## 2026-11-14 (ALMA, asistente del libro)
+- `chat-ia/`: botón con el avatar de ALMA (assets/img/chat/) que abre y cierra el chat en todas las páginas (también Alt+Mayús+C y Esc). Modo libro por defecto (búsqueda en el texto oficial, resúmenes, ejercicios, personajes, recomendación de lectura, mensaje de apoyo y recursos ante expresiones de autolesión). Conexión opcional a Ollama o a un servidor compatible con OpenAI desde los ajustes; por defecto no se hace ninguna petición de red.
+- `modelos-ia/`: catálogo orientativo y guía de instalación (sin pesos de modelos).
