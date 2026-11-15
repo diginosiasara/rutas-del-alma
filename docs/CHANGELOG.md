@@ -47,3 +47,8 @@
 ## 2026-11-14 (lector y dislexia)
 - Resaltado de la frase que lee el lector de voz (con opción de párrafo o ninguno) y corrección de títulos leídos sin espacios.
 - Ayuda con palabras: sílabas, escucha, significado sencillo y enlaces al libro (`js/ayuda-lectura.js`).
+
+## 2026-11-15 (auditoría y ALMA v2)
+- Auditoría H-01: `version-anterior/` ahora lleva `robots noindex, follow` (antes `index, follow`). H-04: valores de servidores/modelos se insertan con DOM (`createElement`/`textContent`) y `esc()` escapa comillas. H-08: `check_site.py` revisa la versión anterior (robots, enlaces, recursos), `url()` de CSS y ficheros sin referenciar. Páginas nuevas: `privacidad.html` (datos locales, terceros, ALMA) enlazada desde el pie.
+- Corrección: el aviso de la nota al lector solo estaba en el pie de la portada; ahora está en el pie de todas las páginas.
+- ALMA v2: ajustes «Para ti» (perfil de respuesta, longitud, creatividad, instrucciones, voz, lectura automática, recordar) y «Avanzado» (proveedor, dirección, modelo, detección por prioridad: paquete `modelos-ia/` → Ollama → Antigravity (informativo) → otros locales → externo solo con confirmación). Voz: botón «Escuchar» en cada respuesta, «Léeme este capítulo» abre el lector. Índice regenerable (`tools/generar_indice_alma.py`) con glosario y lugares. `modelos-ia/manifest.json` y `scripts/start-ai.*` (sin probar en todos los sistemas).

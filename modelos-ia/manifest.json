@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "nota": "Paquete local opcional. Para activarlo: coloca un modelo GGUF en modelos-ia/gguf/, inicia el servicio con scripts/start-ai.sh (o .ps1) y añade el modelo a «models». Mientras «models» esté vacío, ALMA no usa este paquete.",
+  "runtime": { "endpoint": "http://127.0.0.1:8080", "api": "openai", "engine": "llama.cpp (llama-server)" },
+  "models": []
+}

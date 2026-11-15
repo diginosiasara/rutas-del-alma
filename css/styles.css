@@ -515,3 +515,8 @@ html:has(dialog[open]) { overflow: hidden; }
 /* Aviso de la versión anterior (archivo) */
 .archivo-banner { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: center; justify-content: center; padding: .65rem 1rem; background: #3b2f12; color: #fff6dc; font: .85rem/1.4 var(--sans, system-ui); text-align: center; }
 .archivo-banner a { color: #ffd86b; font-weight: 600; text-underline-offset: .2em; }
+
+.priv-tabla { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.priv-tabla th, .priv-tabla td { padding: .6rem .7rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.priv-tabla th { font: 600 .75rem var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.priv-tabla code { font-size: .82rem; overflow-wrap: anywhere; }

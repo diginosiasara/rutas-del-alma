@@ -46,7 +46,32 @@ for f in sorted(glob.glob('*.html')):
     if '<link rel="canonical"' not in s_nc: warns.append(f'{f}: sin canonical activo (pendiente de dominio)')
 for t, fs in titles.items():
     if len(fs) > 1: errors.append(f'title repetido «{t}»: {", ".join(fs)}')
-print(f'{len(glob.glob("*.html"))} páginas revisadas')
+# ---- versión anterior (archivo): robots, enlaces y recursos
+def check_archive():
+    for f in sorted(glob.glob('version-anterior/*.html')):
+        s = open(f, encoding='utf8').read(); ids = re.findall(r'\sid="([^"]+)"', s)
+        r = re.search(r'<meta name="robots" content="([^"]*)"', s)
+        if not r or 'noindex' not in r.group(1): errors.append(f'{f}: la versión anterior debe tener robots noindex (tiene «{r.group(1) if r else "nada"}»)')
+        for ref in re.findall(r'(?:src|href)="(\.\./(?:assets|css|js)/[^"#?]+)"', s):
+            if not os.path.exists(os.path.normpath(os.path.join('version-anterior', ref))): errors.append(f'{f}: no existe {ref}')
+        for a in set(re.findall(r'href="#([^"]+)"', s)):
+            if a not in ids: errors.append(f'{f}: ancla #{a} sin destino')
+        for h, a in re.findall(r'href="([\w-]+\.html)(?:#([^"]*))?"', s):
+            tp = os.path.join('version-anterior', h)
+            if not os.path.exists(tp): errors.append(f'{f}: enlace a página inexistente {h}')
+            elif a and f'id="{a}"' not in open(tp, encoding='utf8').read(): errors.append(f'{f}: {h}#{a} sin destino')
+check_archive()
+# ---- CSS: url() y @import; JS/CSS sin referenciar
+referenced = set()
+for f in glob.glob('*.html'):
+    referenced |= set(re.findall(r'(?:href|src)="((?:css|js|chat-ia)/[^"#?]+)"', open(f, encoding='utf8').read()))
+for c in glob.glob('css/*.css'):
+    t = open(c, encoding='utf8').read()
+    for u in re.findall(r'url\((?![\'"]?(?:data:|https?:|#))[\'"]?([^)\'"]+)', t):
+        if not os.path.exists(os.path.normpath(os.path.join('css', u.split('?')[0]))): errors.append(f'{c}: url() sin fichero {u}')
+for a in sorted(glob.glob('css/*.css') + glob.glob('js/*.js') + glob.glob('chat-ia/*.js') + glob.glob('chat-ia/*.css')):
+    if a not in referenced and not a.startswith('css/cap-') and 'indice.js' not in a: warns.append(f'{a}: no referenciado desde ninguna página principal')
+print(f'{len(glob.glob("*.html"))} páginas revisadas (+ {len(glob.glob("version-anterior/*.html"))} de la versión anterior)')
 for w in sorted(set(w.split(': ',1)[1] for w in warns)): print('AVISO:', w, f'({len(warns)} páginas)')
 for e in errors: print('ERROR:', e)
 print('OK, sin errores' if not errors else f'{len(errors)} errores')

@@ -102,7 +102,7 @@
   /* ---------- ventana de ayuda ---------- */
   var pop, lastFocus, lastWord = "", say = null;
   function el(tag, attrs, html) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; }
-  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
   function base() { var s = document.querySelector('script[src$="js/ayuda-lectura.js"]'); return s ? s.getAttribute("src").replace("js/ayuda-lectura.js", "") : ""; }
   function voice() { var vs = window.speechSynthesis ? speechSynthesis.getVoices() : []; return vs.filter(function (v) { return /^es/i.test(v.lang); })[0] || null; }
   function speak(list) {

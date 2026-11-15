@@ -18,9 +18,10 @@ Libro digital ilustrado: sitio estático (HTML + CSS + JavaScript nativo), sin b
 
 ## Comprobaciones antes de publicar
 ```
-python3 tools/check_site.py           # IDs únicos, anclas, enlaces, títulos, alt, rel seguro, CSS repetido
+python3 tools/check_site.py           # IDs, anclas, enlaces, títulos, alt, rel seguro, CSS repetido, versión anterior (noindex y recursos), url() de CSS
 python3 tools/inventario_assets.py    # docs/inventario-assets.csv (no borra nada)
 python3 tools/make_sitemap.py https://TU-DOMINIO   # sitemap.xml y robots.txt
+python3 tools/generar_indice_alma.py  # regenera el conocimiento de ALMA tras cambiar textos
 ```
 Al tener dominio, activa también `canonical` y `og:url`/`og:image` (están como comentario con `TU-DOMINIO` en cada `<head>`).
 

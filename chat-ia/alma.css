@@ -66,3 +66,22 @@
 @keyframes alma-msg { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes alma-blink { 50% { opacity: 0; } }
 @media print { .alma-fab, .alma-panel, .alma-bubble { display: none !important; } }
+/* ajustes v2: pestañas, campos, informe de detección, voz */
+.alma-tabs { display: flex; gap: .3rem; margin-bottom: .8rem; border-bottom: 1px solid var(--line, #ccc); }
+.alma-tabs button { padding: .5rem .9rem; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--ink-soft, #2f484c); font: 600 .9rem var(--sans, system-ui); cursor: pointer; }
+.alma-tabs button[aria-selected="true"] { color: var(--ink, #132e33); border-bottom-color: var(--gold-text, #7a5a36); }
+.alma-f { margin-top: .7rem; }
+.alma-f label { display: block; font: 600 .75rem/1.2 var(--sans, system-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #4f6165); }
+.alma-f select, .alma-f input[type=text], .alma-f input[type=password], .alma-f textarea { width: 100%; margin-top: .25rem; padding: .5rem .6rem; border: 1.5px solid var(--line, #ccc); border-radius: 10px; background: var(--paper, #fff); color: inherit; font: .95rem var(--sans, system-ui); text-transform: none; letter-spacing: 0; }
+.alma-f input[type=range] { width: 100%; margin-top: .3rem; accent-color: var(--ink, #132e33); }
+.alma-f textarea { resize: vertical; }
+.alma-hint { margin-top: .25rem; font-size: .78rem; color: var(--muted, #4f6165); }
+.alma-report { margin: .9rem 0 0; padding-left: 1.2rem; font-size: .82rem; color: var(--ink-soft, #2f484c); }
+.alma-report li { margin-top: .3rem; }
+.alma-report li[data-s="ok"]::marker { color: #2e8b57; content: "✔ "; }
+.alma-report li[data-s="miss"]::marker { color: #b3261e; content: "✖ "; }
+.alma-report li[data-s="info"]::marker { content: "ℹ "; }
+.alma-tools { margin-top: .5rem; }
+.alma-tools button { padding: .2rem .7rem; border: 1px solid var(--line, #ccc); border-radius: 999px; background: transparent; color: inherit; font: .8rem var(--sans, system-ui); cursor: pointer; }
+.alma-tools button:hover, .alma-tools button[aria-pressed="true"] { background: color-mix(in srgb, var(--gold, #c8a882) 30%, transparent); }
+.alma-ibtn[data-act="stopvoice"] { font-size: .95rem; }
