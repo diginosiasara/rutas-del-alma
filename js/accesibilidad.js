@@ -2,11 +2,11 @@
 (function () {
   "use strict";
   var KEY = "rutas-reading-preferences";
-  var DEF = { size: "0", font: "original", lh: "0", ls: "0", width: "normal", bg: "original", palette: "original", motion: "auto", underline: "0", justify: "0", focus: "0", ruler: "0" };
+  var DEF = { size: "0", font: "original", lh: "0", ls: "0", width: "normal", bg: "original", palette: "original", motion: "auto", underline: "0", justify: "0", focus: "0", ruler: "0", hl: "sentence", wordhelp: "0" };
   var OPT = {
     size: ["0", "1", "2", "3", "4"], font: ["original", "verdana", "arial"], lh: ["0", "1", "2"], ls: ["0", "1", "2"], width: ["narrow", "normal", "wide"],
     bg: ["original", "crema", "sepia", "gris", "oscuro", "contraste"], palette: ["original", "azul", "mono"], motion: ["auto", "reduce"],
-    underline: ["0", "1"], justify: ["0", "1"], focus: ["0", "1"], ruler: ["0", "1"]
+    underline: ["0", "1"], justify: ["0", "1"], focus: ["0", "1"], ruler: ["0", "1"], hl: ["sentence", "block", "none"], wordhelp: ["0", "1"]
   };
   var prefs = load();
   var root = document.documentElement;
@@ -19,7 +19,7 @@
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(prefs)); } catch (e) { /* almacenamiento bloqueado */ } }
   function apply() {
-    var m = { size: "data-a-size", font: "data-a-font", lh: "data-a-lh", ls: "data-a-ls", width: "data-a-width", bg: "data-a-bg", palette: "data-a-palette", motion: "data-a-motion", underline: "data-a-underline", justify: "data-a-justify", focus: "data-a-focus" };
+    var m = { size: "data-a-size", font: "data-a-font", lh: "data-a-lh", ls: "data-a-ls", width: "data-a-width", bg: "data-a-bg", palette: "data-a-palette", motion: "data-a-motion", underline: "data-a-underline", justify: "data-a-justify", focus: "data-a-focus", wordhelp: "data-a-wordhelp" };
     Object.keys(m).forEach(function (k) {
       var def = DEF[k];
       if (prefs[k] === def || (k === "motion" && prefs[k] === "auto")) root.removeAttribute(m[k]); else root.setAttribute(m[k], prefs[k]);
@@ -36,13 +36,15 @@
     ["ls", "Espaciado de letras y palabras", [["0", "Normal"], ["1", "Ampliado"], ["2", "Muy ampliado"]]],
     ["width", "Ancho de lectura", [["narrow", "Estrecho"], ["normal", "Normal"], ["wide", "Amplio"]]],
     ["bg", "Fondo de lectura", [["original", "Original"], ["crema", "Crema"], ["sepia", "Sepia"], ["gris", "Gris"], ["oscuro", "Oscuro"], ["contraste", "Alto contraste"]]],
-    ["palette", "Colores de acento (daltonismo)", [["original", "Original"], ["azul", "Azul y naranja"], ["mono", "Monocromo"]]]
+    ["palette", "Colores de acento (daltonismo)", [["original", "Original"], ["azul", "Azul y naranja"], ["mono", "Monocromo"]]],
+    ["hl", "Resaltado del lector de voz", [["sentence", "Frase"], ["block", "Párrafo"], ["none", "Ninguno"]]]
   ];
   var CHECKS = [
     ["underline", "Subrayar siempre los enlaces"],
     ["justify", "Texto justificado (por defecto, alineado a la izquierda)"],
     ["focus", "Modo sin distracciones: oculta decoración y material complementario"],
-    ["ruler", "Regla de lectura que sigue al puntero y al foco"]
+    ["ruler", "Regla de lectura que sigue al puntero y al foco"],
+    ["wordhelp", "Ayuda con palabras: toca una palabra para ver sus sílabas y su significado"]
   ];
 
   function say(t) { if (status) { status.textContent = ""; setTimeout(function () { status.textContent = t; }, 30); } }
@@ -62,6 +64,7 @@
     h += '<div class="a-checks">';
     CHECKS.forEach(function (c) { h += '<label><input type="checkbox" name="a-' + c[0] + '"' + (prefs[c[0]] === "1" ? " checked" : "") + '><span>' + c[1] + '</span></label>'; });
     h += '<label><input type="checkbox" name="a-motion"' + (prefs.motion === "reduce" ? " checked" : "") + '><span>Reducir animaciones y movimiento</span></label></div>';
+    h += '<button type="button" class="a-reset" data-consult>Consultar la palabra seleccionada</button>';
     h += '<p class="a-note">Tus ajustes se guardan solo en este navegador y dispositivo. No se envían a ningún servidor.</p>';
     h += '<button type="button" class="a-reset">Restablecer todo</button>';
     panel.innerHTML = h;
@@ -71,6 +74,7 @@
 
     fab.addEventListener("click", function () { panel.hidden ? open() : close(); });
     panel.querySelector(".a-close").addEventListener("click", close);
+    panel.querySelector("[data-consult]").addEventListener("click", function () { var t = String(window.getSelection ? window.getSelection() : ""); close(); document.dispatchEvent(new CustomEvent("rutas:consultar", { detail: { text: t } })); });
     panel.querySelector(".a-reset").addEventListener("click", function () {
       prefs = {}; for (var k in DEF) prefs[k] = DEF[k]; save(); apply(); sync(); say("Ajustes restablecidos");
     });

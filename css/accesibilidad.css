@@ -81,3 +81,27 @@ html[data-a-focus="1"] .llamada::before { display: none; }
 .cap-nav__next:only-child { grid-column: 1 / -1; }
 /* continuar leyendo */
 .menu__top.is-leido .menu__kicker::after { content: " · leído \2713"; letter-spacing: .08em; }
+
+/* resaltado de la frase que lee el lector de voz */
+::highlight(lectura-frase) { background-color: rgba(255, 214, 0, .55); color: inherit; }
+html[data-a-bg="oscuro"] ::highlight(lectura-frase) { background-color: rgba(255, 214, 0, .35); color: #fff; }
+html[data-a-bg="contraste"] ::highlight(lectura-frase) { background-color: #ffe600; color: #000; }
+html[data-a-wordhelp="1"] main :is(p, li, dd, blockquote, figcaption, h3, h4) { cursor: help; }
+/* ayuda con palabras: sílabas y significado */
+.a-word { position: fixed; z-index: 80; width: min(22rem, calc(100vw - 1.5rem)); padding: 1rem 1.1rem 1.1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); color: var(--ink); box-shadow: 0 24px 60px -20px rgba(0,0,0,.5); font: .95rem/1.5 var(--sans, system-ui); }
+.a-word[hidden] { display: none; }
+.a-word h2 { margin: 0 0 .2rem; font: 600 1.5rem/1.2 var(--serif); overflow-wrap: anywhere; }
+.a-word__syl { display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem; margin: .1rem 0 .15rem; font: 600 1.7rem/1.3 var(--body); }
+.a-word__syl span:nth-child(odd) { color: var(--ink); }
+.a-word__syl span:nth-child(even) { color: var(--gold-text); }
+.a-word__syl i { color: var(--muted); font-style: normal; }
+.a-word__n { margin: 0 0 .6rem; color: var(--muted); font-size: .85rem; }
+.a-word__def { margin: .6rem 0 0; padding: .6rem .8rem; border-left: 4px solid var(--gold-text); background: color-mix(in srgb, var(--gold) 14%, transparent); }
+.a-word__def strong { display: block; font: 600 .72rem/1.2 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .2rem; }
+.a-word__book { margin-top: .6rem; font-size: .85rem; }
+.a-word__book a { display: inline-block; margin: .15rem .3rem 0 0; padding: .1rem .6rem; border: 1px solid var(--line); border-radius: 999px; color: inherit; text-decoration: none; }
+.a-word__btns { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem; }
+.a-word__btns button { padding: .45rem .85rem; border: 1.5px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); font: 600 .85rem var(--sans, system-ui); cursor: pointer; }
+.a-word__btns button:hover { background: var(--ink); color: var(--paper); }
+.a-word :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.a-word__note { margin-top: .7rem; color: var(--muted); font-size: .78rem; }

@@ -7,6 +7,8 @@
 - **Navegación anterior/siguiente** al final del prólogo y de cada capítulo.
 - **Portada** con botones «Comenzar a leer» y «Explorar el universo».
 - **Cuaderno personal** (`js/cuaderno.js`, `css/cuaderno.css`): cada ejercicio oficial tiene su campo «Mis notas» con contador, guardado automático (aviso «Guardado a las HH:MM»), descarga en .txt, copia de seguridad .json, importación, impresión y borrado con confirmación; la página del cuaderno muestra «Mi progreso» (n de 26). Aviso de privacidad y de almacenamiento bloqueado incluidos.
+- **Resaltado del lector de voz por frase** (CSS Custom Highlight API, sin tocar el HTML): opciones Frase / Párrafo / Ninguno en «Mi lectura». Si el navegador no la soporta, se mantiene el resaltado de párrafo. Corregida además la lectura de títulos formados por varios `<span>` (se leían pegados).
+- **Ayuda con palabras** (`js/ayuda-lectura.js`): al activarla en «Mi lectura», tocar una palabra muestra sus sílabas (separación silábica del español, validada con 60 palabras), permite escucharla entera o por sílabas, da un significado sencillo de ~40 términos del libro y enlaza dónde aparece. Atajo Alt+Mayús+W sobre una palabra seleccionada, o botón «Consultar la palabra seleccionada».
 - **Impresión limpia** (`css/print.css`): sin menús, animaciones ni controles.
 - **Lector de voz**: panel identificado como región con nombre accesible.
 - **Vídeos** de YouTube con subtítulos en español activados por defecto.
@@ -14,8 +16,8 @@
 
 ## Pendiente (requiere pruebas con personas o decisiones)
 - Pruebas reales con NVDA, JAWS, VoiceOver y TalkBack; medición completa WCAG 2.2 AA (Lighthouse, axe).
-- Lector de voz: resaltado por frase, lectura por frases, anuncio de cambios de apartado, explicación de las limitaciones en segundo plano.
-- Dislexia: separación silábica, glosario contextual, resúmenes de capítulo, fuente OpenDyslexic/Atkinson (hay que incluir los ficheros y revisar licencias).
+- Lector de voz: anuncio de cambios de apartado, explicación de las limitaciones en segundo plano; el resaltado por frase depende de CSS Custom Highlight API (Chrome/Edge 105+, Safari 17.2+, Firefox 140+).
+- Dislexia: resúmenes de capítulo, mostrar sílabas en todo el texto, fuente OpenDyslexic/Atkinson (incluir ficheros y revisar licencias); revisar y ampliar el glosario con la autora.
 - Audio/LSE: transcripciones y subtítulos propios, vídeos en lengua de signos.
-- Chat IA «ALMA»: requiere backend/agente local y decisión sobre modelos (ver informe).
+- Chat IA «ALMA»: hecha la primera versión (modo libro + modelo local opcional). Pendiente: embeddings/búsqueda semántica, servidor MCP y agente auxiliar de detección.
 - Modularizar `main.js`, plantillas de componentes comunes, PWA, canonical/sitemap con el dominio real.
