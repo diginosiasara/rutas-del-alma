@@ -8,6 +8,18 @@ html[data-a-size="1"] { --a-scale: 1.12; } html[data-a-size="2"] { --a-scale: 1.
 html[data-a-size="3"] { --a-scale: 1.4; }  html[data-a-size="4"] { --a-scale: 1.6; }
 
 html[data-a-font="verdana"] { --body: Verdana, Tahoma, sans-serif; --serif: Verdana, Tahoma, sans-serif; }
+/* Fuentes alojadas en el sitio (licencia SIL OFL 1.1, ver assets/fonts/). Solo se descargan si la persona las elige. */
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 400; font-display: swap; src: url(../assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: italic; font-weight: 400; font-display: swap; src: url(../assets/fonts/atkinson-hyperlegible-latin-400-italic.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 700; font-display: swap; src: url(../assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: italic; font-weight: 700; font-display: swap; src: url(../assets/fonts/atkinson-hyperlegible-latin-700-italic.woff2) format("woff2"); }
+@font-face { font-family: "OpenDyslexic"; font-style: normal; font-weight: 400; font-display: swap; src: url(../assets/fonts/opendyslexic-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "OpenDyslexic"; font-style: italic; font-weight: 400; font-display: swap; src: url(../assets/fonts/opendyslexic-latin-400-italic.woff2) format("woff2"); }
+@font-face { font-family: "OpenDyslexic"; font-style: normal; font-weight: 700; font-display: swap; src: url(../assets/fonts/opendyslexic-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "OpenDyslexic"; font-style: italic; font-weight: 700; font-display: swap; src: url(../assets/fonts/opendyslexic-latin-700-italic.woff2) format("woff2"); }
+html[data-a-font="atkinson"] { --body: "Atkinson Hyperlegible", Verdana, sans-serif; --serif: "Atkinson Hyperlegible", Verdana, sans-serif; }
+html[data-a-font="opendyslexic"] { --body: "OpenDyslexic", "Comic Sans MS", Verdana, sans-serif; --serif: "OpenDyslexic", "Comic Sans MS", Verdana, sans-serif; }
+html[data-a-font="opendyslexic"] body { font-size: .94em; }
 html[data-a-font="arial"]   { --body: Arial, Helvetica, sans-serif; --serif: Arial, Helvetica, sans-serif; }
 html[data-a-lh="1"] :where(p, li, dd, blockquote, figcaption, .hero__lead) { line-height: 1.9 !important; }
 html[data-a-lh="2"] :where(p, li, dd, blockquote, figcaption, .hero__lead) { line-height: 2.2 !important; }

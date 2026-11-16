@@ -4,7 +4,7 @@
   var KEY = "rutas-reading-preferences";
   var DEF = { size: "0", font: "original", lh: "0", ls: "0", width: "normal", bg: "original", palette: "original", motion: "auto", underline: "0", justify: "0", focus: "0", ruler: "0", hl: "sentence", wordhelp: "0" };
   var OPT = {
-    size: ["0", "1", "2", "3", "4"], font: ["original", "verdana", "arial"], lh: ["0", "1", "2"], ls: ["0", "1", "2"], width: ["narrow", "normal", "wide"],
+    size: ["0", "1", "2", "3", "4"], font: ["original", "verdana", "arial", "atkinson", "opendyslexic"], lh: ["0", "1", "2"], ls: ["0", "1", "2"], width: ["narrow", "normal", "wide"],
     bg: ["original", "crema", "sepia", "gris", "oscuro", "contraste"], palette: ["original", "azul", "mono"], motion: ["auto", "reduce"],
     underline: ["0", "1"], justify: ["0", "1"], focus: ["0", "1"], ruler: ["0", "1"], hl: ["sentence", "block", "none"], wordhelp: ["0", "1"]
   };
@@ -31,7 +31,7 @@
   var ruler = null, panel, fab, status, lastFocus;
   var GROUPS = [
     ["size", "Tamaño de letra", [["0", "Normal"], ["1", "Grande"], ["2", "Más grande"], ["3", "Muy grande"], ["4", "Extra"]]],
-    ["font", "Tipografía", [["original", "Original"], ["verdana", "Verdana"], ["arial", "Arial"]]],
+    ["font", "Tipografía", [["original", "Original"], ["atkinson", "Atkinson Hyperlegible"], ["opendyslexic", "OpenDyslexic"], ["verdana", "Verdana"], ["arial", "Arial"]]],
     ["lh", "Interlineado", [["0", "Normal"], ["1", "Amplio"], ["2", "Extra amplio"]]],
     ["ls", "Espaciado de letras y palabras", [["0", "Normal"], ["1", "Ampliado"], ["2", "Muy ampliado"]]],
     ["width", "Ancho de lectura", [["narrow", "Estrecho"], ["normal", "Normal"], ["wide", "Amplio"]]],

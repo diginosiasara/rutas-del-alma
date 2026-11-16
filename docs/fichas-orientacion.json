@@ -1,0 +1,63 @@
+{
+  "_nota": "Resúmenes de apoyo escritos para la web a partir del manuscrito corregido. NO son texto del libro. Edita aquí y ejecuta: python3 tools/aplicar_fichas.py",
+  "prologo": {
+    "trata": "En un pueblo de un reino olvidado, los jóvenes guardianes Liam y Elara cuidan el Gran Libro de Fábulas en un templo en lo alto de la colina. Una tormenta trae un enjambre de aves negras que se queda quieto alrededor del templo y que el pueblo empieza a temer. Entre las páginas del libro aparece una brújula dorada que no señala un lugar, sino una pregunta: ¿quién quieres ser para llegar adonde vas?",
+    "personajes": ["Liam", "Elara"],
+    "conceptos": ["Las lámparas mágicas", "El Gran Libro de Fábulas", "Las aves negras", "La brújula dorada"],
+    "recuerda": ["Las fábulas del libro son espejos: muestran creencias que alguien confundió con la realidad.", "Las aves negras no atacan a nadie: solo están quietas, y el pueblo las teme.", "La brújula dorada señala una pregunta, no un lugar."]
+  },
+  "1": {
+    "trata": "Liam y Elara leen en el templo la historia de Aides, un joven cuyo jardín —su mente— está lleno de malezas heredadas: miedo, duda y resentimiento. El sabio Callum le enseña a distinguir los hechos de los juicios y a cuidar cada día solo lo que quiere ver crecer. Esa tarde, en la plaza, el pueblo habla de malezas.",
+    "personajes": ["Liam", "Elara", "Aides", "Callum"],
+    "conceptos": ["El jardín como mente", "Las creencias, como semillas", "Acción constante y responsabilidad"],
+    "recuerda": ["Lo que ya ha brotado son los hechos de tu vida; lo que siembras sobre ellos son tus juicios.", "La maleza vuelve si te descuidas: el cuidado es constante.", "Cada uno decide qué semillas cuida."]
+  },
+  "2": {
+    "trata": "Junto al lago, bajo el Sauce del Reflejo, Elara enseña a escuchar como un espejo claro. Tomás, un joven agricultor al que la tormenta arrasó la cosecha, es el primero en hablar; al ser escuchado sin que intenten arreglarlo, empieza a hablar de lo que quiere sembrar. Otros vecinos se suman al círculo.",
+    "personajes": ["Liam", "Elara", "Tomás"],
+    "conceptos": ["La escucha activa", "Reflejar sin juzgar", "Preguntas poderosas"],
+    "recuerda": ["Escuchar no es esperar el turno para hablar: es devolver lo que oímos para que el otro pueda verse.", "Una pregunta como «¿qué se abre ahora?» desplaza la atención de lo perdido a lo posible.", "La oscuridad no desapareció, pero se disipó el silencio que la alimentaba."]
+  },
+  "3": {
+    "trata": "Antes de transformar al pueblo, Liam y Elara se conocen a sí mismos. Liam, el Explorador Visionario, y Elara, la Guardiana del Alma, repasan sus fortalezas, sus dudas y el precio de cada don. Comprenden que son complementarios y que cada uno tiene también una sombra. Esa noche, en lugar de una fábula, se cuentan sus propias historias.",
+    "personajes": ["Liam", "Elara"],
+    "conceptos": ["Conocer nuestras figuras interiores", "Integrar opuestos", "Propósito compartido"],
+    "recuerda": ["Él da dirección a la sensibilidad de ella; ella da profundidad al impulso de él.", "Reconocer la propia sombra es parte del camino.", "Para transformar al pueblo, primero hay que transformarse uno mismo."]
+  },
+  "4": {
+    "trata": "Un conejo gris con un lazo rojo conduce a Liam y Elara a un claro donde el Consejero de Sombreros les presenta los Seis sombreros para pensar de Edward de Bono: seis maneras de mirar un problema. Probándolos, entienden que las respuestas dependen de desde dónde se buscan, y que una pregunta poderosa es una llave maestra.",
+    "personajes": ["Liam", "Elara", "El Consejero de Sombreros", "El conejo gris"],
+    "conceptos": ["Las preguntas crean realidad", "Cambiar de perspectiva", "Autoindagación", "Los seis sombreros"],
+    "recuerda": ["Blanco: los hechos. Rojo: las emociones. Negro: la cautela. Amarillo: el optimismo. Verde: la creatividad. Azul: la organización.", "Cada sombrero es una puerta distinta hacia el mismo problema.", "Una pregunta poderosa es una llave maestra: abre una habitación de la mente que no sabíamos que teníamos."]
+  },
+  "5": {
+    "trata": "Liam y Elara reúnen al pueblo en la plaza y, con las preguntas aprendidas, hablan de los hechos, de lo que sienten, de los riesgos y de las oportunidades. María, Javier y Ana descubren miedos y deseos compartidos, y de ahí nacen ideas: una escuela comunitaria, ferias de oficios y comités para coordinar cada proyecto.",
+    "personajes": ["Liam", "Elara", "María", "Javier", "Ana", "El conejo gris"],
+    "conceptos": ["Las historias que no vemos", "Las emociones como guía", "Co-creación", "De lo personal a lo colectivo"],
+    "recuerda": ["Bajo cada queja hay un miedo, y bajo cada miedo, un deseo.", "Decir en voz alta lo que pesa puede aflojarlo.", "Cada vecino aporta una pieza, y las piezas empiezan a encajar."]
+  },
+  "6": {
+    "trata": "El Gran Libro revela que una parte próspera del pueblo quedó sumergida por una presa y fue olvidada durante generaciones. El pueblo se llena de ruido: maldición, miedo, exigencias. Liam propone separar el grano de la paja: los hechos, que alimentan, de las interpretaciones y los miedos, que confunden. Al aclarar los hechos, los conflictos bajan.",
+    "personajes": ["Liam", "Elara", "Roberto", "Lucía", "María", "Javier"],
+    "conceptos": ["Hechos y juicios", "Un pasado visto con otros ojos", "Comprensión compartida", "Nuestro pasado sumergido"],
+    "recuerda": ["Es un hecho que una parte del pueblo lleva generaciones bajo el agua; que estemos malditos es un juicio.", "Llevaban semanas llamando amenaza a unas aves que solo estaban quietas.", "El verdadero entendimiento nace de distinguir lo que ocurrió de lo que decidimos pensar sobre ello."]
+  },
+  "7": {
+    "trata": "El Gran Libro de Fábulas se reescribe ante los ojos de Liam y Elara. La brújula dorada, acercada a una página, hace visibles fragmentos ocultos y los guía a una cámara secreta del templo, donde un cofre guarda documentos, mapas y objetos antiguos. Descubren que la presa no fue solo una defensa y que las aves negras tienen un nombre: Custodias.",
+    "personajes": ["Liam", "Elara"],
+    "conceptos": ["Las sombras que evitamos", "El libro vivo", "Las inscripciones y el pasado", "La brújula: integrar perspectivas", "El cofre y la transmutación"],
+    "recuerda": ["La brújula dorada guía la narración del libro: ilumina lo que antes era invisible.", "Durante semanas el pueblo temió a las guardianas de algo valioso.", "Las claves que buscan se revelan cuando el grano se separa de la paja."]
+  },
+  "8": {
+    "trata": "Liam y Elara sueñan por separado y al despertar descubren que los sueños forman un mismo tapiz. Elara, en un jardín mágico, recibe la imagen de un amuleto como su intuición. Liam, en un mapa vivo, aprende a planificar una decisión, abre una puerta de bronce y encuentra un espejo. Al despertar, él tiene la llave y ella el amuleto.",
+    "personajes": ["Liam", "Elara"],
+    "conceptos": ["Claridad antes de decidir", "La intuición como brújula", "Los recursos que ya tenemos"],
+    "recuerda": ["Planificar una decisión es como planificar un viaje: hay que saber adónde queremos llegar.", "El amuleto es la intuición: confía en lo que sientes.", "Sus sueños no eran visiones pasajeras: eran guías."]
+  },
+  "9": {
+    "trata": "Llega al pueblo una caravana de sabios nómadas con carpas cubiertas de símbolos; con ellos viaja Callum. Bajo la carpa más grande se abre una función de historias, no de fieras, donde cada vecino reconoce escenas de su propia vida. Aides, ya convertido en sabio, ve cómo el pueblo aplica su lección, y el pueblo empieza a escribir un nuevo guion para su futuro.",
+    "personajes": ["Callum", "María", "Tomás", "Javier", "Aides", "Liam", "Elara", "Los sabios nómadas"],
+    "conceptos": ["La conversación como mapa", "Reescribir la historia", "Guardián y narrador de tu vida", "De lo individual a lo colectivo"],
+    "recuerda": ["Dirigir una conversación es como trazar un mapa: hay que saber adónde queremos llegar.", "Al reescribir su historia, el pueblo escribe un nuevo guion para su futuro.", "En el templo, el Gran Libro sigue abierto: faltaba mucho por escribir."]
+  }
+}

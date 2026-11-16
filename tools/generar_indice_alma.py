@@ -30,6 +30,12 @@ for f, n in pages:
     ep = re.search(r'<p class="hero__lead">«(.*?)» <cite class="hero__cite">— (.*?)</cite>', main, re.S)
     label = ('Prólogo · ' + title) if n == 0 else f'Capítulo {n} · {title}'
     chapters.append({"n": n, "t": title, "f": f, "ep": clean(ep.group(1)) if ep else '', "epa": clean(ep.group(2)) if ep else ''})
+    ori = section(main, 'orientacion')
+    if ori:
+        trata = re.search(r'<h3>De qué trata</h3><p>(.*?)</p>', ori, re.S); quien = re.search(r'<ul class="orient__tags">(.*?)</ul>', ori, re.S)
+        ideas = re.search(r'<h3>Ideas que se trabajan</h3><ul>(.*?)</ul>', ori, re.S); rev = re.search(r'<details class="orient__rev">.*?<ul>(.*?)</ul>', ori, re.S)
+        lis = lambda m: ', '.join(clean(x) for x in re.findall(r'<li>(.*?)</li>', m.group(1), re.S)) if m else ''
+        add(n, label, 'Ficha de orientación (resumen de apoyo)', f + '#orientacion', f'De qué trata: {clean(trata.group(1)) if trata else ""} ¶ Quién aparece: {lis(quien)}. ¶ Ideas que se trabajan: {lis(ideas)}. ¶ Para recordar: {" ".join(clean(x) for x in re.findall(r"<li>(.*?)</li>", rev.group(1), re.S)) if rev else ""}')
     if ep: add(n, label, 'Epígrafe', f + '#inicio', f'Epígrafe del capítulo: «{clean(ep.group(1))}» — {clean(ep.group(2))}')
     rel = section(main, 'relato'); body = re.sub(r'<aside class="llevarte".*?</aside>', '', rel, flags=re.S)
     for g in group([clean(p) for p in re.findall(r'<p[^>]*>(.*?)</p>', body, re.S)]): add(n, label, 'Relato', f + '#relato', g)

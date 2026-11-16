@@ -9,6 +9,8 @@
 - **Cuaderno personal** (`js/cuaderno.js`, `css/cuaderno.css`): cada ejercicio oficial tiene su campo «Mis notas» con contador, guardado automático (aviso «Guardado a las HH:MM»), descarga en .txt, copia de seguridad .json, importación, impresión y borrado con confirmación; la página del cuaderno muestra «Mi progreso» (n de 26). Aviso de privacidad y de almacenamiento bloqueado incluidos.
 - **Resaltado del lector de voz por frase** (CSS Custom Highlight API, sin tocar el HTML): opciones Frase / Párrafo / Ninguno en «Mi lectura». Si el navegador no la soporta, se mantiene el resaltado de párrafo. Corregida además la lectura de títulos formados por varios `<span>` (se leían pegados).
 - **Ayuda con palabras** (`js/ayuda-lectura.js`): al activarla en «Mi lectura», tocar una palabra muestra sus sílabas (separación silábica del español, validada con 60 palabras), permite escucharla entera o por sílabas, da un significado sencillo de ~40 términos del libro y enlaza dónde aparece. Atajo Alt+Mayús+W sobre una palabra seleccionada, o botón «Consultar la palabra seleccionada».
+- **Fuentes para dislexia**: Atkinson Hyperlegible y OpenDyslexic (SIL OFL 1.1) alojadas en `assets/fonts/` con sus licencias y glifos del español verificados; solo se descargan al elegirlas en «Mi lectura». Hay que valorarlas con usuarios: no hay evidencia sólida de que una fuente concreta ayude a todas las personas.
+- **Fichas de orientación** en el prólogo y los 9 capítulos (de qué trata, quién aparece, ideas, «Repasar lo leído»), editables en `docs/fichas-orientacion.json` y aplicables con `tools/aplicar_fichas.py`. Marcadas como resumen de apoyo, no texto del libro; ALMA las usa para «Resume este capítulo».
 - **Impresión limpia** (`css/print.css`): sin menús, animaciones ni controles.
 - **Lector de voz**: panel identificado como región con nombre accesible.
 - **Vídeos** de YouTube con subtítulos en español activados por defecto.
@@ -17,7 +19,7 @@
 ## Pendiente (requiere pruebas con personas o decisiones)
 - Pruebas reales con NVDA, JAWS, VoiceOver y TalkBack; medición completa WCAG 2.2 AA (Lighthouse, axe).
 - Lector de voz: anuncio de cambios de apartado, explicación de las limitaciones en segundo plano; el resaltado por frase depende de CSS Custom Highlight API (Chrome/Edge 105+, Safari 17.2+, Firefox 140+).
-- Dislexia: resúmenes de capítulo, mostrar sílabas en todo el texto, fuente OpenDyslexic/Atkinson (incluir ficheros y revisar licencias); revisar y ampliar el glosario con la autora.
+- Dislexia: mostrar sílabas en todo el texto; revisar con la autora el glosario y las fichas de orientación.
 - Audio/LSE: transcripciones y subtítulos propios, vídeos en lengua de signos.
 - Chat IA «ALMA»: hecha la v2 (perfiles, voz, detección por prioridad). Pendiente: búsqueda semántica con embeddings, servidor MCP/Antigravity, TTS local (Piper), pruebas de estrés con modelos reales y probar los scripts de arranque en Windows/Linux/macOS.
 - Modularizar `main.js`, plantillas de componentes comunes, PWA, canonical/sitemap con el dominio real.
