@@ -19,7 +19,7 @@
     creativo: { n: "Creativo", i: "Propón interpretaciones e ideas imaginativas, dejando claro qué es tu interpretación y qué dice el libro.", k: 3, x: 300, intro: "El libro dice esto; a partir de ahí podemos imaginar:" }
   };
   var LENGTHS = { corta: { n: "Corta", w: 80, tok: 180 }, media: { n: "Media", w: 150, tok: 340 }, larga: { n: "Larga", w: 300, tok: 700 } };
-  var DEF = { provider: "none", url: "http://localhost:11434", model: "", creativity: 0.6, profile: "conversacional", length: "media", extra: "", remember: "0", voice: "", rate: 1, autoread: "0", consent: "0", extUrl: "", extOk: "0", resolved: null };
+  var DEF = { provider: "none", url: "http://localhost:11434", model: "", creativity: 0.6, profile: "conversacional", length: "media", extra: "", remember: "0", voice: "", rate: 1, autoread: "0", consent: "0", extUrl: "", extOk: "0", resolved: null, embed: "" };
   var cfg = loadCfg(), index = null, history = [], busy = false, abortCtl = null, sessionToken = "", speakToken = 0, lastReport = [];
   var page = location.pathname.split("/").pop() || "index.html";
   var base = (function () { var s = document.querySelector('script[src$="chat-ia/alma.js"]'); return s ? s.getAttribute("src").replace("chat-ia/alma.js", "") : ""; })();
@@ -69,7 +69,7 @@
     panel.addEventListener("click", function (e) {
       var b = e.target.closest("[data-act]"); if (!b) return; var a = b.getAttribute("data-act");
       if (a === "close") close(); else if (a === "clear") clearChat(); else if (a === "set") toggleSet(); else if (a === "stopvoice") stopSpeech();
-      else if (a === "save") { readSet(); toggleSet(false); refreshStatus(); }
+      else if (a === "save") { readSet(); toggleSet(false); refreshStatus(); vecState = "none"; ensureIndex(prepareVectors); }
       else if (a === "detect") runDetect(); else if (a === "test") testConn(); else if (a === "testvoice") speakText("Hola, soy ALMA. Así suena mi voz con estos ajustes.");
       else if (a === "tab") selectTab(b.getAttribute("data-tab"));
     });
@@ -117,6 +117,7 @@
     a.appendChild(fld("alma-url", "Dirección del servicio", mk("input", { id: "alma-url", type: "text", inputmode: "url", autocomplete: "off", spellcheck: "false" })));
     var model = mk("input", { id: "alma-model", type: "text", list: "alma-models", autocomplete: "off", spellcheck: "false", placeholder: "p. ej. qwen3:8b" }); var dl = mk("datalist", { id: "alma-models" });
     a.appendChild(fld("alma-model", "Modelo", model)); a.appendChild(dl);
+    a.appendChild(fld("alma-embed", "Modelo de embeddings (opcional)", mk("input", { id: "alma-embed", type: "text", list: "alma-models", autocomplete: "off", spellcheck: "false", placeholder: "p. ej. nomic-embed-text" }), "Activa la búsqueda semántica: ALMA entiende mejor las preguntas parafraseadas. Los vectores se calculan una vez con tu servidor y se guardan en este navegador."));
     if (SITE.allowExternal !== false) {
       a.appendChild(fld("alma-exturl", "Proveedor externo: dirección (https)", mk("input", { id: "alma-exturl", type: "text", inputmode: "url", autocomplete: "off", spellcheck: "false", placeholder: "https://…" })));
       a.appendChild(fld("alma-token", "Clave de acceso (opcional; solo se guarda hasta cerrar la pestaña)", mk("input", { id: "alma-token", type: "password", autocomplete: "off" }), "No escribas aquí claves de uso general: viajan desde el navegador. Para el público, usa un servidor intermedio."));
@@ -141,14 +142,14 @@
   }
   function fillSet() {
     $("alma-profile").value = cfg.profile; $("alma-length").value = cfg.length; $("alma-creat").value = cfg.creativity; $("alma-extra").value = cfg.extra; $("alma-rate").value = cfg.rate; $("alma-auto").checked = cfg.autoread === "1"; $("alma-mem").checked = cfg.remember === "1";
-    if ($("alma-prov")) { $("alma-prov").value = cfg.provider; $("alma-url").value = cfg.url; $("alma-model").value = cfg.model; if ($("alma-exturl")) { $("alma-exturl").value = cfg.extUrl; $("alma-token").value = sessionToken; $("alma-extok").checked = cfg.extOk === "1"; } }
+    if ($("alma-prov")) { $("alma-prov").value = cfg.provider; $("alma-url").value = cfg.url; $("alma-model").value = cfg.model; $("alma-embed").value = cfg.embed; if ($("alma-exturl")) { $("alma-exturl").value = cfg.extUrl; $("alma-token").value = sessionToken; $("alma-extok").checked = cfg.extOk === "1"; } }
   }
   function readSet() {
     cfg.profile = $("alma-profile").value; cfg.length = $("alma-length").value; cfg.creativity = Math.min(1, Math.max(0, parseFloat($("alma-creat").value) || 0)); cfg.extra = $("alma-extra").value.slice(0, 400);
     cfg.voice = $("alma-voice").value; cfg.rate = Math.min(1.4, Math.max(0.7, parseFloat($("alma-rate").value) || 1)); cfg.autoread = $("alma-auto").checked ? "1" : "0"; cfg.remember = $("alma-mem").checked ? "1" : "0";
     if (cfg.remember === "0") { try { localStorage.removeItem(HIST_KEY); } catch (e) {} }
     if ($("alma-prov")) {
-      cfg.provider = $("alma-prov").value; var u = safeUrl($("alma-url").value); cfg.url = u || DEF.url; cfg.model = $("alma-model").value.trim();
+      cfg.provider = $("alma-prov").value; var u = safeUrl($("alma-url").value); cfg.url = u || DEF.url; cfg.model = $("alma-model").value.trim(); cfg.embed = $("alma-embed").value.trim();
       if ($("alma-exturl")) { cfg.extUrl = $("alma-exturl").value.trim(); sessionToken = $("alma-token").value; cfg.extOk = $("alma-extok").checked ? "1" : "0"; }
       if (cfg.provider === "external" && (!/^https:/.test(cfg.extUrl) && !isLocal(cfg.extUrl))) { setMsg("El proveedor externo debe usar https."); cfg.provider = "none"; }
     }
@@ -158,20 +159,22 @@
   function refreshStatus() {
     var eff = effective(), txt = "Modo libro (sin IA)";
     if (eff) txt = provLabel(eff.provider) + " · " + eff.model; else if (cfg.provider === "auto") txt = "Modo libro · automático sin modelo";
+    if (eff && cfg.embed && vecState === "ready") txt += " + semántica"; else if (eff && cfg.embed && vecState === "error") txt += " (sin semántica)";
     chipEl.textContent = txt; chipEl.setAttribute("data-ok", eff ? "1" : "0");
     foot.textContent = eff ? (isLocal(eff.url) ? "Responde un modelo local; ALMA cita el libro. Puede equivocarse: comprueba en el texto." : "⚠ Servidor no local: tus mensajes salen de tu equipo.") : "ALMA busca en el texto oficial del libro. No sustituye la atención profesional.";
   }
   function open() {
     panel.hidden = false; bubble.hidden = true; fab.setAttribute("aria-expanded", "true"); fab.setAttribute("aria-label", "Cerrar el chat con ALMA");
     ensureIndex(function () { if (!log.children.length) welcome(); });
-    if (cfg.provider === "auto" && !effective() && cfg.consent === "1") runDetect(true);
+    if (cfg.provider === "auto" && !effective() && cfg.consent === "1") runDetect(true).then(function () { ensureIndex(prepareVectors); }); else ensureIndex(prepareVectors);
     setTimeout(function () { input.focus(); }, 30);
   }
   function close() { panel.hidden = true; fab.setAttribute("aria-expanded", "false"); fab.setAttribute("aria-label", "Hablar con ALMA, asistente del libro"); stopSpeech(); fab.focus(); }
   function ensureIndex(cb) {
-    if (window.ALMA_INDEX) { index = prepare(window.ALMA_INDEX); return cb && cb(); }
-    var s = document.createElement("script"); s.src = base + "chat-ia/indice.js"; s.onload = function () { index = prepare(window.ALMA_INDEX); cb && cb(); };
-    s.onerror = function () { botMsg("No he podido cargar el índice del libro. Si abres la web como archivo local, prueba con un servidor (por ejemplo: python3 -m http.server)."); }; document.head.appendChild(s);
+    function ready() { index = window.ALMA_INDEX; if (!R) R = window.AlmaRetrieval.create(index); cb && cb(); }
+    function load(src, next) { var sc = document.createElement("script"); sc.src = base + src; sc.onload = next; sc.onerror = function () { botMsg("No he podido cargar el conocimiento del libro (" + src + "). Si abres la web como archivo, prueba con un servidor local (por ejemplo: python3 -m http.server)."); }; document.head.appendChild(sc); }
+    if (window.ALMA_INDEX && window.AlmaRetrieval) return ready();
+    load("chat-ia/indice.js", function () { if (window.AlmaRetrieval) ready(); else load("chat-ia/retrieval.js", ready); });
   }
 
   /* ---------- voz ---------- */
@@ -222,22 +225,12 @@
   }
   function chap(n) { return index && index.chapters.filter(function (c) { return c.n === n; })[0]; }
 
-  /* ---------- búsqueda en el libro ---------- */
-  var STOP = {}; ("de la que el en y a los del se las por un para con no una su al lo como mas pero sus le ya o este si porque esta entre cuando muy sin sobre tambien me hasta hay donde quien desde todo nos durante todos uno les ni contra otros ese eso ante ellos e esto mi antes algunos unos yo otro otras otra tanto esa estos mucho quienes nada muchos cual poco ella estar estas algunas algo nosotros es son ser fue ha he soy eres te mis tu tus puedes puedo quiero dime cuentame explica hablame habla sobre libro dice dicen").split(" ").forEach(function (w) { STOP[w] = 1; });
-  function norm(s) { return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
-  function stem(w) { w = w.replace(/(mente|ciones|cion|es|s)$/, function (m) { return w.length - m.length >= 4 ? "" : m; }); return w.length > 7 ? w.slice(0, 7) : w; }
-  function toks(s) { return norm(s).split(/[^a-z0-9ñ]+/).filter(function (w) { return w.length > 2 && !STOP[w]; }).map(stem); }
-  function prepare(raw) {
-    if (raw._ready) return raw; var df = {}, N = raw.chunks.length;
-    raw.chunks.forEach(function (c) { var tf = {}; toks(c.x + " " + c.s + " " + c.t).forEach(function (t) { tf[t] = (tf[t] || 0) + 1; }); c._tf = tf; Object.keys(tf).forEach(function (t) { df[t] = (df[t] || 0) + 1; }); });
-    raw._idf = function (t) { return Math.log(1 + N / (1 + (df[t] || 0))); }; raw._ready = true; return raw;
-  }
-  function search(q, k) {
-    var qs = toks(q); if (!qs.length) return []; var ctx = chapterContext();
-    var res = index.chunks.map(function (c) { var s = 0; qs.forEach(function (t) { if (c._tf[t]) s += (1 + Math.log(c._tf[t])) * index._idf(t); }); if (s && ctx && c.cap === ctx.n) s *= 1.25; if (c.s === "Epígrafe") s *= .6; if (c.cap === -5 || c.cap === -6) s *= .85; return { c: c, s: s }; })
-      .filter(function (r) { return r.s > 1.6; }).sort(function (a, b) { return b.s - a.s; });
-    return res.slice(0, k || 3).map(function (r) { return r.c; });
-  }
+  /* ---------- búsqueda en el libro (módulo retrieval.js) ---------- */
+  var R = null, lastTopic = "", lastShown = [];
+  function norm(s) { return window.AlmaRetrieval.norm(s); }
+  function toks(s) { return window.AlmaRetrieval.tokens(s); }
+  function searchFull(q, k, extra) { var ctx = chapterContext(), o = { chapter: ctx ? ctx.n : null, exclude: q.indexOf(FUP) === 0 ? lastShown : [] }, e; for (e in (extra || {})) o[e] = extra[e]; return R.search(q, k, o); }
+  function search(q, k) { return searchFull(q, k).hits; }
   function excerpt(t, n) { n = n || 300; if (t.length <= n) return t; var cut = t.slice(0, n), i = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("; ")); return (i > 120 ? cut.slice(0, i + 1) : cut.replace(/\s+\S*$/, "")) + " […]"; }
   function where(c) { return c.cap > 0 ? "Cap. " + c.cap + " · " : c.cap === 0 ? "Prólogo · " : ""; }
   function srcOf(c) { return { u: c.u, label: c.cap <= -5 ? c.s : where(c) + c.s.replace(/:.*/, "") }; }
@@ -286,16 +279,40 @@
     if (nm.length && /(quien|personaje|cuent|habl)/.test(n) && nm.length <= 2) return { html: nm.map(function (c) { return "<p>" + esc(c.x) + "</p>"; }).join(""), src: nm.map(function (c) { return { u: c.u, label: c.s.replace("Personaje: ", "Ficha de ") }; }), plain: nm[0].x };
     return null;
   }
+  function quoteHtml(c, q, xx) {
+    var glos = c.cap === -5, c2 = glos ? { x: c.x.replace(/^[^.]*\. Definición general y sencilla \(no es texto del libro\): /, "") } : c, sn = R.snippet(c2, q, xx);
+    var h = sn.parts.map(function (p) { return p.hit ? "<mark>" + esc(p.t) + "</mark>" : esc(p.t); }).join("");
+    return '<div class="alma-quote"><strong>' + esc(where(c) + c.s) + (glos ? " (definición general, no es texto del libro)" : "") + ":</strong> " + (sn.start ? "… " : "") + h + (sn.end ? " …" : "") + "</div>";
+  }
+  function suggestions(c, q) {
+    var out = [];
+    if (c) out.push("Muéstrame otro pasaje");
+    if (c && c.cap > 0) { out.push("Resume el capítulo " + c.cap); out.push("¿Qué ejercicios hay en el capítulo " + c.cap + "?"); } else if (c && c.cap === 0) out.push("Resume el prólogo");
+    return out.slice(0, 3);
+  }
   function localSearch(q) {
-    var P = PROFILES[cfg.profile], kk = Math.max(1, P.k - (cfg.length === "corta" ? 1 : 0) + (cfg.length === "larga" ? 1 : 0)), xx = Math.round(P.x * (cfg.length === "corta" ? .7 : cfg.length === "larga" ? 1.4 : 1)), hits = search(q, kk);
-    if (!hits.length) return { html: "<p>No he encontrado nada claro sobre eso en el texto del libro. Prueba con otras palabras o pregúntame por un capítulo, un personaje o un ejercicio.</p>", plain: "Sin resultados" };
-    var h = "<p>" + esc(P.intro) + "</p>" + hits.map(function (c) { var glos = c.cap === -5; return '<div class="alma-quote"><strong>' + esc(where(c) + c.s) + (glos ? " (definición general, no es texto del libro)" : "") + ":</strong> " + esc(excerpt(c.x.replace(/^[^.]*\. Definición general y sencilla \(no es texto del libro\): /, ""), xx)) + "</div>"; }).join("");
-    return { html: h, src: dedupe(hits.map(srcOf)), plain: hits.map(function (c) { return c.x; }).join(" ") };
+    var P = PROFILES[cfg.profile], kk = Math.max(1, P.k - (cfg.length === "corta" ? 1 : 0) + (cfg.length === "larga" ? 1 : 0)), xx = Math.round(P.x * (cfg.length === "corta" ? .7 : cfg.length === "larga" ? 1.4 : 1)), res = searchFull(q, kk), hits = res.hits;
+    if (!hits.length || (res.conf === "baja" && (res.scores[0] < 2.2 || res.ratio <= .34))) return { html: "<p>No he encontrado nada claro sobre eso en el texto del libro. Prueba con otras palabras o pregúntame por un capítulo, un personaje o un ejercicio.</p>", plain: "Sin resultados", sugg: [] };
+    var low = res.conf === "baja", shown = low ? hits.slice(0, 1) : hits;
+    var h = "<p>" + esc(low ? "No estoy segura de que esto responda a tu pregunta; es lo más cercano que he encontrado en el libro:" : P.intro) + "</p>" + shown.map(function (c) { return quoteHtml(c, q, xx); }).join("");
+    lastShown = shown.map(function (c) { return c.i; }); return { html: h, src: dedupe(shown.map(srcOf)), plain: shown.map(function (c) { return c.x; }).join(" "), sugg: suggestions(hits[0], q), found: true };
+  }
+  var FUP = "\u2063";   /* marca interna: pregunta de continuación (excluye lo ya mostrado) */
+  function followUp(q) { /* preguntas cortas o de continuación: se completan con el tema anterior */
+    var short = toks(q).length < 2 || /^(y |mas |cuentame mas|amplia|explica mejor|y eso|continua|sigue|dame un ejemplo|ejemplo|muestrame otro)/.test(norm(q));
+    return short && lastTopic && !/(cap(itulo)?\.? ?\d|prologo)/.test(norm(q)) ? FUP + lastTopic + " " + q : q;
+  }
+  function showSuggestions(list) { chips.textContent = ""; (list || []).forEach(function (t) { chips.appendChild(mk("button", { type: "button", text: t })); }); }
+  var overviewCache = "";
+  function overview() {
+    if (overviewCache) return overviewCache; var cs = index.chapters.map(function (c) { return (c.n === 0 ? "Prólogo" : "Capítulo " + c.n) + " — " + c.t; }), pj = index.chunks.filter(function (c) { return c.cap === -1; }).map(function (c) { return c.s.replace("Personaje: ", ""); });
+    return (overviewCache = "ESTRUCTURA DEL LIBRO: " + cs.join("; ") + ". Además: cuaderno de práctica (5 ejercicios) y bibliografía sugerida.\nPERSONAJES: " + pj.join(", ") + ".");
   }
 
   /* ---------- proveedores y detección ---------- */
   function withTimeout(ms) { var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms); return { signal: c.signal, done: function () { clearTimeout(t); } }; }
   function getJson(url, headers) { var w = withTimeout(1800); return fetch(url, { signal: w.signal, headers: headers || {} }).then(function (r) { w.done(); if (!r.ok) throw new Error("http " + r.status); return r.json(); }).catch(function (e) { w.done(); throw e; }); }
+  function pickEmbed(ms) { return ms.filter(function (m) { return /embed|nomic|bge|minilm|e5-|gte|arctic/i.test(m); })[0] || ""; }
   function pickModel(ms) { var ok = ms.filter(function (m) { return !/embed|nomic|bge|whisper|tts|rerank/i.test(m); }); return ok.filter(function (m) { return /qwen|llama|gemma|mistral|phi/i.test(m); })[0] || ok[0] || null; }
   function listOllama(url) { return getJson(url + "/api/tags").then(function (j) { return (j.models || []).map(function (m) { return m.name; }); }); }
   function listOpenAI(url, tok) { return getJson(url + "/v1/models", tok ? { Authorization: "Bearer " + tok } : {}).then(function (j) { return (j.data || []).map(function (m) { return m.id; }); }); }
@@ -316,7 +333,7 @@
     var ps = probes(), rep = panel.querySelector(".alma-report"); if (rep) rep.textContent = ""; setMsg("Buscando modelos…");
     return Promise.all(ps.map(function (p) { if (!p.run) return Promise.resolve({ p: p, status: "info" }); return p.run().then(function (r) { return { p: p, status: r.models.length ? "ok" : "empty", r: r }; }).catch(function () { return { p: p, status: "miss" }; }); })).then(function (res) {
       var best = null, seen = {}, wantAuto = ($("alma-prov") ? $("alma-prov").value : cfg.provider) === "auto";
-      res.forEach(function (x) { if (x.status === "ok") { var key = x.r.url.replace("localhost", "127.0.0.1"); if (seen[key]) { x.status = "info"; x.p = { label: x.p.label, info: "Es el mismo servicio que el anterior." }; return; } seen[key] = 1; if (!best) { var m = pickModel(x.r.models); if (m) best = { provider: x.r.provider, url: x.r.url, model: m }; } } });
+      res.forEach(function (x) { if (x.status === "ok") { var key = x.r.url.replace("localhost", "127.0.0.1"); if (seen[key]) { x.status = "info"; x.p = { label: x.p.label, info: "Es el mismo servicio que el anterior." }; return; } seen[key] = 1; if (!best) { var m = pickModel(x.r.models); if (m) best = { provider: x.r.provider, url: x.r.url, model: m, embed: pickEmbed(x.r.models) }; } } });
       lastReport = res;
       if (rep) res.forEach(function (x, i) {
         var t = (i + 1) + ". " + x.p.label + " — " + (x.status === "ok" ? "disponible (" + x.r.models.slice(0, 4).join(", ") + (x.r.models.length > 4 ? "…" : "") + ")" : x.status === "empty" ? "responde, pero no hay modelos instalados" : x.status === "info" ? x.p.info : x.p.miss);
@@ -324,7 +341,7 @@
       });
       var dl = panel.querySelector("#alma-models"); if (dl) { dl.textContent = ""; res.forEach(function (x) { if (x.status === "ok") x.r.models.forEach(function (m) { dl.appendChild(mk("option", { value: m })); }); }); }
       if (best && (wantAuto || !silent)) {
-        if (wantAuto) { cfg.provider = "auto"; cfg.resolved = best; saveCfg(); } else if (!cfg.model) { cfg.model = best.model; $("alma-model") && ($("alma-model").value = best.model); saveCfg(); }
+        if (wantAuto) { cfg.provider = "auto"; cfg.resolved = best; if (!cfg.embed && best.embed) cfg.embed = best.embed; saveCfg(); } else if (!cfg.model) { cfg.model = best.model; $("alma-model") && ($("alma-model").value = best.model); saveCfg(); }
         setMsg("Modelo encontrado: " + provLabel(best.provider) + " · " + best.model + (wantAuto ? " (en uso)." : ". Elige «Automático» para usarlo."));
       } else setMsg(best ? "" : "No he encontrado ningún modelo disponible; ALMA seguirá en modo libro.");
       refreshStatus(); return best;
@@ -338,6 +355,30 @@
     pr.then(function (ms) { var dl = $("alma-models"); dl.textContent = ""; ms.forEach(function (m) { dl.appendChild(mk("option", { value: m })); }); if (!cfg.model && pickModel(ms)) { cfg.model = pickModel(ms); $("alma-model").value = cfg.model; saveCfg(); } setMsg("Conectado. Modelos: " + (ms.join(", ") || "ninguno") + "." + (isLocal(u) ? "" : " ⚠ Dirección no local: tus mensajes saldrán de tu equipo.")); refreshStatus(); }).catch(function () { setMsg("No he podido conectar con " + u + "."); });
   }
 
+  /* ---------- búsqueda semántica opcional (embeddings) ---------- */
+  var vecState = "none", vecKey = "";
+  function idb(fn) { return new Promise(function (res, rej) { if (!window.indexedDB) return rej(new Error("sin indexedDB")); var rq = indexedDB.open("rutas-alma", 1); rq.onupgradeneeded = function () { rq.result.createObjectStore("vec", { keyPath: "k" }); }; rq.onerror = function () { rej(rq.error); }; rq.onsuccess = function () { fn(rq.result, res, rej); }; }); }
+  function idbGet(k) { return idb(function (db, res, rej) { var g = db.transaction("vec").objectStore("vec").get(k); g.onsuccess = function () { res(g.result ? g.result.v : null); }; g.onerror = function () { rej(g.error); }; }); }
+  function idbPut(k, v) { return idb(function (db, res, rej) { var t = db.transaction("vec", "readwrite"); t.objectStore("vec").put({ k: k, v: v }); t.oncomplete = function () { res(); }; t.onerror = function () { rej(t.error); }; }); }
+  function l2(v) { var s = 0, i; for (i = 0; i < v.length; i++) s += v[i] * v[i]; s = Math.sqrt(s) || 1; return v.map(function (x) { return x / s; }); }
+  function embedCall(eff, texts) {
+    var ollama = eff.provider === "ollama", headers = { "Content-Type": "application/json" }; if (eff.provider === "external" && sessionToken) headers.Authorization = "Bearer " + sessionToken;
+    return fetch(eff.url + (ollama ? "/api/embed" : "/v1/embeddings"), { method: "POST", headers: headers, body: JSON.stringify({ model: cfg.embed, input: texts }) }).then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+      .then(function (j) { var v = ollama ? j.embeddings : (j.data || []).map(function (d) { return d.embedding; }); if (!v || v.length !== texts.length) throw new Error("respuesta de embeddings no válida"); return v.map(l2); });
+  }
+  function prepareVectors() {
+    var eff = effective(); if (!eff || !cfg.embed || !R || vecState === "loading") return Promise.resolve(false);
+    var key = "v" + (index.version || 0) + ":" + index.chunks.length + ":" + cfg.embed + ":" + eff.provider; if (vecState === "ready" && vecKey === key) return Promise.resolve(true);
+    vecState = "loading"; vecKey = key;
+    return idbGet(key).catch(function () { return null; }).then(function (cached) {
+      if (cached && cached.length === index.chunks.length) { R.setVectors(cached); vecState = "ready"; refreshStatus(); return true; }
+      var out = [], i = 0, B = 24;
+      function next() { if (i >= index.chunks.length) return Promise.resolve(); chipEl.textContent = "Preparando búsqueda semántica " + i + "/" + index.chunks.length + "…"; var part = index.chunks.slice(i, i + B).map(function (c) { return c.s + ". " + c.x.slice(0, 900); }); return embedCall(eff, part).then(function (v) { out = out.concat(v); i += B; return next(); }); }
+      return next().then(function () { R.setVectors(out); vecState = "ready"; idbPut(key, out).catch(function () {}); refreshStatus(); return true; });
+    }).catch(function () { vecState = "error"; R.setVectors(null); refreshStatus(); return false; });
+  }
+  function queryVector(q) { var eff = effective(); if (!R || !R.hasVectors() || !eff) return Promise.resolve(null); return embedCall(eff, [q]).then(function (v) { return v[0]; }).catch(function () { return null; }); }
+
   /* ---------- modelo ---------- */
   function systemPrompt() {
     var P = PROFILES[cfg.profile], L = LENGTHS[cfg.length], cc = chapterContext();
@@ -347,8 +388,8 @@
     return s;
   }
   function askModel(q, hits, onChunk, eff) {
-    var P = PROFILES[cfg.profile], ctxt = hits.length ? hits.map(function (c, i) { return "[" + (i + 1) + "] (" + (c.cap > 0 ? "Capítulo " + c.cap : c.cap === 0 ? "Prólogo" : c.t) + " · " + c.s + ") " + excerpt(c.x, 700); }).join("\n") : "(sin fragmentos relevantes)";
-    var msgs = [{ role: "system", content: systemPrompt() }].concat(history.slice(-7, -1)).concat([{ role: "user", content: "FRAGMENTOS DEL LIBRO:\n" + ctxt + "\n\nPREGUNTA: " + q }]);
+    var ctxt = hits.length ? hits.map(function (c, i) { return "[" + (i + 1) + "] (" + (c.cap > 0 ? "Capítulo " + c.cap : c.cap === 0 ? "Prólogo" : c.t) + " · " + c.s + ") " + R.snippet(c, q, 650).text; }).join("\n") : "(sin fragmentos relevantes)";
+    var msgs = [{ role: "system", content: systemPrompt() + "\n" + overview() }].concat(history.slice(-7, -1)).concat([{ role: "user", content: "FRAGMENTOS DEL LIBRO:\n" + ctxt + "\n\nPREGUNTA: " + q + "\n(Responde solo con lo que apoyan los fragmentos; si no basta, dilo.)" }]);
     abortCtl = new AbortController(); var ollama = eff.provider === "ollama", L = LENGTHS[cfg.length];
     var body = ollama ? { model: eff.model, messages: msgs, stream: true, options: { temperature: cfg.creativity, num_predict: L.tok } } : { model: eff.model, messages: msgs, stream: true, temperature: cfg.creativity, max_tokens: L.tok };
     var headers = { "Content-Type": "application/json" }; if (eff.provider === "external" && sessionToken) headers.Authorization = "Bearer " + sessionToken;
@@ -364,17 +405,19 @@
   function setBusy(b) { busy = b; send.textContent = b ? "Detener" : "Enviar"; send.setAttribute("data-stop", b ? "1" : "0"); }
   function ask(q) {
     userMsg(q); chips.textContent = ""; ensureIndex(function () {
-      var la = localAnswer(q); if (la) { botMsg(la.html, la.src, la.plain); return; }
-      var eff = effective(); if (!eff) { var r = localSearch(q); botMsg(r.html, r.src, r.plain); return; }
-      if (eff.provider === "external" && !isLocal(eff.url) && cfg.extOk !== "1") { var r0 = localSearch(q); botMsg(r0.html, r0.src, r0.plain); return; }
-      var hits = search(q, PROFILES[cfg.profile].k + 1), m = botMsg('<p class="alma-typing">Pensando</p>', null, null, true); setBusy(true);
-      askModel(q, hits, function (t) { m.innerHTML = rich(t); log.scrollTop = log.scrollHeight; }, eff).then(function (full) {
-        if (!full) m.innerHTML = rich("No he recibido respuesta del modelo."); history.push({ role: "assistant", content: full || "" }); persist();
-        if (hits.length) m.appendChild(srcList(dedupe(hits.map(srcOf)))); tools(m); setBusy(false); log.scrollTop = log.scrollHeight; if (cfg.autoread === "1") speakText(plainOf(m));
+      var la = localAnswer(q); if (la) { botMsg(la.html, la.src, la.plain); showChips(); return; }
+      var qs = followUp(q), eff = effective();
+      if (!eff || (eff.provider === "external" && !isLocal(eff.url) && cfg.extOk !== "1")) { var r = localSearch(qs); if (r.found) lastTopic = qs.replace(FUP, ""); botMsg(r.html, r.src, r.plain); showSuggestions(r.sugg); return; }
+      var m = botMsg('<p class="alma-typing">Pensando</p>', null, null, true); setBusy(true); var hits = [];
+      queryVector(qs.replace(FUP, "")).then(function (qv) { var res = searchFull(qs, PROFILES[cfg.profile].k + 1, qv ? { qvec: qv } : {}); hits = res.hits; if (hits.length) { lastTopic = qs.replace(FUP, ""); lastShown = hits.map(function (c) { return c.i; }); } return askModel(qs, hits, function (t) { m.innerHTML = rich(t); log.scrollTop = log.scrollHeight; }, eff); }).then(function (full) {
+        full = (full || "").replace(/\[(\d+)\]/g, function (x, n) { return +n >= 1 && +n <= hits.length ? x : ""; }).trim();
+        if (full.length < 12) { var r2 = localSearch(qs); m.className = "alma-msg alma-msg--bot"; m.innerHTML = "<p><em>El modelo no ha dado una respuesta útil; esto es lo que dice el libro:</em></p>" + r2.html; if (r2.src) m.appendChild(srcList(r2.src)); tools(m); setBusy(false); showSuggestions(r2.sugg); return; }
+        m.innerHTML = rich(full); history.push({ role: "assistant", content: full }); persist();
+        if (hits.length) m.appendChild(srcList(dedupe(hits.map(srcOf)))); tools(m); setBusy(false); log.scrollTop = log.scrollHeight; showSuggestions(suggestions(hits[0], qs)); if (cfg.autoread === "1") speakText(plainOf(m));
       }).catch(function (err) {
         setBusy(false); if (err && err.name === "AbortError") { m.appendChild(mk("p", { html: "<em>(respuesta detenida)</em>" })); return; }
         m.className = "alma-msg alma-msg--err"; m.innerHTML = "<p><strong>No he podido hablar con el modelo.</strong> Comprueba que el servidor está en marcha, que el nombre del modelo es correcto y que permite este origen (en Ollama, <code>OLLAMA_ORIGINS</code>).</p><p>Mientras tanto, te respondo con el libro:</p>";
-        var r2 = localSearch(q), tmp = mk("div"); tmp.innerHTML = r2.html; while (tmp.firstChild) m.appendChild(tmp.firstChild); if (r2.src) m.appendChild(srcList(r2.src)); tools(m);
+        var r3 = localSearch(qs), tmp = mk("div"); tmp.innerHTML = r3.html; while (tmp.firstChild) m.appendChild(tmp.firstChild); if (r3.src) m.appendChild(srcList(r3.src)); tools(m); showSuggestions(r3.sugg);
       });
     });
   }

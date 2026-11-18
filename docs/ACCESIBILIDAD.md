@@ -21,5 +21,5 @@
 - Lector de voz: anuncio de cambios de apartado, explicación de las limitaciones en segundo plano; el resaltado por frase depende de CSS Custom Highlight API (Chrome/Edge 105+, Safari 17.2+, Firefox 140+).
 - Dislexia: mostrar sílabas en todo el texto; revisar con la autora el glosario y las fichas de orientación.
 - Audio/LSE: transcripciones y subtítulos propios, vídeos en lengua de signos.
-- Chat IA «ALMA»: hecha la v2 (perfiles, voz, detección por prioridad). Pendiente: búsqueda semántica con embeddings, servidor MCP/Antigravity, TTS local (Piper), pruebas de estrés con modelos reales y probar los scripts de arranque en Windows/Linux/macOS.
+- Chat IA «ALMA»: hecha la v2 (perfiles, voz, detección por prioridad). Hecho: búsqueda mejorada y búsqueda semántica opcional (sin medir con modelos reales). Pendiente: servidor MCP/Antigravity, TTS local (Piper), pruebas con modelos reales y probar los scripts de arranque en Windows/Linux/macOS.
 - Modularizar `main.js`, plantillas de componentes comunes, PWA, canonical/sitemap con el dominio real.

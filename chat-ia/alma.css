@@ -85,3 +85,4 @@
 .alma-tools button { padding: .2rem .7rem; border: 1px solid var(--line, #ccc); border-radius: 999px; background: transparent; color: inherit; font: .8rem var(--sans, system-ui); cursor: pointer; }
 .alma-tools button:hover, .alma-tools button[aria-pressed="true"] { background: color-mix(in srgb, var(--gold, #c8a882) 30%, transparent); }
 .alma-ibtn[data-act="stopvoice"] { font-size: .95rem; }
+.alma-quote mark { background: color-mix(in srgb, #ffd600 55%, transparent); color: inherit; padding: 0 .1em; border-radius: 3px; }

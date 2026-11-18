@@ -11,6 +11,7 @@ Libro digital ilustrado: sitio estático (HTML + CSS + JavaScript nativo), sin b
 - `assets/img/`: imágenes en WebP con variantes `-640`, `-800`, `-1200`; `assets/img/galeria/` para mapas, escenas y pixel art.
 - `version-anterior/`: copia navegable y completa de la web antes de adoptar el manuscrito corregido (todas las páginas enlazadas entre sí, con aviso y `noindex`).
 - `chat-ia/` y `modelos-ia/`: asistente ALMA (chat con avatar) y guía de modelos locales opcionales.
+- `tests/`: pruebas automáticas (ver `tests/README.md`).
 - `tools/`: scripts de calidad (ver abajo). `docs/`: inventario de assets.
 
 ## Ejecutar en local

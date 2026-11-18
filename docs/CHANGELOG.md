@@ -55,3 +55,9 @@
 
 ## 2026-11-15 (fuentes y fichas)
 - Fuentes Atkinson Hyperlegible y OpenDyslexic alojadas en el sitio (OFL 1.1), seleccionables en «Mi lectura». Fichas de orientación por capítulo (`docs/fichas-orientacion.json`, `tools/aplicar_fichas.py`), con entrada en el índice, el menú y el conocimiento de ALMA.
+
+## 2026-11-16 (respuestas de ALMA y pruebas)
+- Nuevo buscador `chat-ia/retrieval.js` (BM25, sinónimos del libro, frases, tipo de pregunta, diversidad; los fragmentos de glosario, lugares, personajes y fichas solo aparecen si la pregunta los pide). En el conjunto de 61 preguntas de prueba, con el algoritmo anterior restringido al texto del libro: 1.º acierto 80 % → 84 %, entre los 3 primeros 89 % → 97 %.
+- Respuestas: extracto centrado en la frase relevante con términos resaltados, aviso cuando la confianza es baja o no hay relación, «Muéstrame otro pasaje» (excluye lo ya mostrado), sugerencias de seguimiento, preguntas de continuación, y para el modelo: estructura del libro en el prompt, extractos relevantes y eliminación de citas [n] inexistentes.
+- Búsqueda semántica opcional (embeddings, Ollama o servidor compatible) con caché en IndexedDB y caída elegante a búsqueda léxica.
+- `tests/e2e.py` (17 pruebas), `tests/eval_recuperacion.js` y `tests/preguntas.json`.

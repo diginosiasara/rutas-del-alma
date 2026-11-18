@@ -1,0 +1,411 @@
+[
+ {
+  "q": "¿qué hacía Aides para cuidar su jardín?",
+  "ok": [
+   1
+  ]
+ },
+ {
+  "q": "¿Quién es Callum?",
+  "ok": [
+   -1,
+   1,
+   9
+  ]
+ },
+ {
+  "q": "¿qué son las malezas?",
+  "ok": [
+   1,
+   -5
+  ]
+ },
+ {
+  "q": "¿qué enseña el sauce del reflejo?",
+  "ok": [
+   2
+  ]
+ },
+ {
+  "q": "¿cómo se escucha de verdad a otra persona?",
+  "ok": [
+   2
+  ]
+ },
+ {
+  "q": "¿qué le pasó a Tomás?",
+  "ok": [
+   2,
+   -1
+  ]
+ },
+ {
+  "q": "¿cuáles son las figuras interiores?",
+  "ok": [
+   3
+  ]
+ },
+ {
+  "q": "¿cómo se complementan Liam y Elara?",
+  "ok": [
+   3
+  ]
+ },
+ {
+  "q": "¿qué significa cada sombrero?",
+  "ok": [
+   4,
+   -5
+  ]
+ },
+ {
+  "q": "¿qué hace el sombrero verde?",
+  "ok": [
+   4
+  ]
+ },
+ {
+  "q": "¿quién es el consejero de sombreros?",
+  "ok": [
+   4,
+   -1
+  ]
+ },
+ {
+  "q": "¿para qué sirven las preguntas poderosas?",
+  "ok": [
+   4,
+   2
+  ]
+ },
+ {
+  "q": "¿qué ideas surgieron en la plaza?",
+  "ok": [
+   5
+  ]
+ },
+ {
+  "q": "¿qué confesó Javier?",
+  "ok": [
+   5
+  ]
+ },
+ {
+  "q": "¿qué descubrieron sobre el pueblo bajo el agua?",
+  "ok": [
+   6,
+   7
+  ]
+ },
+ {
+  "q": "¿qué es separar el grano de la paja?",
+  "ok": [
+   6,
+   7,
+   -5
+  ]
+ },
+ {
+  "q": "¿qué es un hecho y qué es un juicio?",
+  "ok": [
+   6,
+   1,
+   -5
+  ]
+ },
+ {
+  "q": "¿quién es Lucía?",
+  "ok": [
+   6
+  ]
+ },
+ {
+  "q": "¿qué dice el mensaje de la página dorada?",
+  "ok": [
+   7
+  ]
+ },
+ {
+  "q": "¿qué son las Custodias?",
+  "ok": [
+   7,
+   0,
+   -5
+  ]
+ },
+ {
+  "q": "¿qué había en el cofre?",
+  "ok": [
+   7
+  ]
+ },
+ {
+  "q": "¿qué hace la brújula dorada con el libro?",
+  "ok": [
+   7,
+   0
+  ]
+ },
+ {
+  "q": "¿qué soñó Elara?",
+  "ok": [
+   8
+  ]
+ },
+ {
+  "q": "¿qué simboliza el amuleto?",
+  "ok": [
+   8
+  ]
+ },
+ {
+  "q": "¿qué soñó Liam con el mapa?",
+  "ok": [
+   8
+  ]
+ },
+ {
+  "q": "¿qué es la puerta de bronce?",
+  "ok": [
+   8,
+   -5
+  ]
+ },
+ {
+  "q": "¿qué pasó en el circo de los nómadas?",
+  "ok": [
+   9
+  ]
+ },
+ {
+  "q": "¿cómo reescribe el pueblo su historia?",
+  "ok": [
+   9
+  ]
+ },
+ {
+  "q": "¿quiénes son los sabios nómadas?",
+  "ok": [
+   9,
+   -1
+  ]
+ },
+ {
+  "q": "¿cómo empieza el libro?",
+  "ok": [
+   0
+  ]
+ },
+ {
+  "q": "¿por qué temen a las aves negras?",
+  "ok": [
+   0,
+   6,
+   7
+  ]
+ },
+ {
+  "q": "ejercicio para mis creencias limitantes",
+  "ok": [
+   1
+  ]
+ },
+ {
+  "q": "¿cómo tomo una decisión?",
+  "ok": [
+   8
+  ]
+ },
+ {
+  "q": "quiero un ejercicio para escuchar mejor",
+  "ok": [
+   2
+  ]
+ },
+ {
+  "q": "¿qué libros recomienda la bibliografía?",
+  "ok": [
+   -3
+  ]
+ },
+ {
+  "q": "¿qué es el cuaderno de práctica?",
+  "ok": [
+   -2,
+   -5
+  ]
+ },
+ {
+  "q": "miedo al cambio",
+  "ok": [
+   5,
+   1
+  ]
+ },
+ {
+  "q": "¿qué es la transferencia?",
+  "ok": [
+   -5,
+   1
+  ]
+ },
+ {
+  "q": "¿qué es la individuación?",
+  "ok": [
+   -5,
+   1,
+   3
+  ]
+ },
+ {
+  "q": "¿dónde está el templo?",
+  "ok": [
+   -6,
+   0
+  ]
+ },
+ {
+  "q": "¿qué lugar hay junto al lago?",
+  "ok": [
+   -6,
+   2
+  ]
+ },
+ {
+  "q": "¿qué es un arquetipo?",
+  "ok": [
+   -5,
+   3
+  ]
+ },
+ {
+  "q": "¿cómo planifico un viaje o una decisión?",
+  "ok": [
+   8,
+   9
+  ]
+ },
+ {
+  "q": "¿cuál es el papel del conejo gris?",
+  "ok": [
+   4,
+   5,
+   -1
+  ]
+ },
+ {
+  "q": "¿qué es la escucha activa?",
+  "ok": [
+   2
+  ]
+ },
+ {
+  "q": "¿cómo se reescribe una historia personal?",
+  "ok": [
+   9,
+   5
+  ]
+ },
+ {
+  "q": "tengo miedo, ¿qué dice el libro de eso?",
+  "ok": [
+   1,
+   5,
+   6,
+   0
+  ]
+ },
+ {
+  "q": "¿qué papel tiene la intuición?",
+  "ok": [
+   8
+  ]
+ },
+ {
+  "q": "¿qué quiere decir que el libro es vivo?",
+  "ok": [
+   7
+  ]
+ },
+ {
+  "q": "¿qué le enseña Callum a Aides?",
+  "ok": [
+   1
+  ]
+ },
+ {
+  "q": "¿qué aprenden los vecinos al ser escuchados sin consejos?",
+  "ok": [
+   2
+  ]
+ },
+ {
+  "q": "¿por qué es importante conocerse antes de ayudar a otros?",
+  "ok": [
+   3
+  ]
+ },
+ {
+  "q": "¿de qué maneras se puede mirar un problema?",
+  "ok": [
+   4
+  ]
+ },
+ {
+  "q": "¿qué hace falta para que una comunidad cambie?",
+  "ok": [
+   5,
+   9
+  ]
+ },
+ {
+  "q": "¿qué pasó con la gente que vivía donde ahora hay agua?",
+  "ok": [
+   6,
+   7
+  ]
+ },
+ {
+  "q": "¿cómo ayuda el libro a descubrir los secretos del templo?",
+  "ok": [
+   7
+  ]
+ },
+ {
+  "q": "¿qué enseñan los sueños de los protagonistas?",
+  "ok": [
+   8
+  ]
+ },
+ {
+  "q": "¿qué temen los habitantes al principio?",
+  "ok": [
+   0
+  ]
+ },
+ {
+  "q": "quiero practicar aceptar lo que me da miedo",
+  "ok": [
+   1,
+   5,
+   6,
+   -2
+  ]
+ },
+ {
+  "q": "¿qué simboliza la oscuridad en la historia?",
+  "ok": [
+   0,
+   3,
+   7,
+   1
+  ]
+ },
+ {
+  "q": "¿cómo me ayudan las preguntas a ver otras opciones?",
+  "ok": [
+   4,
+   2
+  ]
+ }
+]
